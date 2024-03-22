@@ -22,6 +22,7 @@ function run_custom_build() {
         make -j $((`nproc`-2)) defconfig ti_arm64_prune.config ti_rt.config
     else
         echo "The current working directory is: $(pwd)"
+        cp ../../../../ti-linux-kernel-rt/riaps.config kernel/configs/riaps.config
         make -j $((`nproc`-2)) defconfig ti_arm64_prune.config ti_rt.config riaps.config
     fi
 
