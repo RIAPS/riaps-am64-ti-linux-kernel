@@ -21,6 +21,7 @@ function run_custom_build() {
     if [ ! -f ".config" ]; then
         make -j $((`nproc`-2)) defconfig ti_arm64_prune.config ti_rt.config
     else
+        echo "The current working directory is: $(pwd)"
         make -j $((`nproc`-2)) defconfig ti_arm64_prune.config ti_rt.config riaps.config
     fi
 
