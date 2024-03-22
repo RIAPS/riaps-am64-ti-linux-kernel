@@ -20,7 +20,8 @@ function run_custom_build() {
 
     if [ ! -f ".config" ]; then
         make -j $((`nproc`-2)) defconfig ti_arm64_prune.config ti_rt.config
-
+    else
+        make -j $((`nproc`-2)) defconfig ti_arm64_prune.config ti_rt.config riaps.config
     fi
 
     make -j $((`nproc`-2)) bindeb-pkg LOCALVERSION=-k3-rt
