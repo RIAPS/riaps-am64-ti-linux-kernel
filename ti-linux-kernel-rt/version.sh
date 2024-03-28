@@ -6,8 +6,8 @@ export require_root=false
 export release_tag="09.02.00.008-rt"
 export package_name="linux-upstream"
 
-export DEBFULLNAME="Mary Metelko"
-export DEBEMAIL="mary.a.metelko@vanderbilt.edu"
+export DEBFULLNAME="Sai Sree Kartheek Adivi"
+export DEBEMAIL="s-adivi@ti.com"
 export KDEB_CHANGELOG_DIST=bookworm
 
 function run_custom_build() {
