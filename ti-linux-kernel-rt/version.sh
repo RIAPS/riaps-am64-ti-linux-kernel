@@ -6,8 +6,8 @@ export require_root=false
 export release_tag="09.02.00.008-rt"
 export package_name="linux-upstream"
 
-export DEBFULLNAME="Sai Sree Kartheek Adivi"
-export DEBEMAIL="s-adivi@ti.com"
+export DEBFULLNAME="Mary Metelko"
+export DEBEMAIL="mary.a.metelko@vanderbilt.edu"
 export KDEB_CHANGELOG_DIST=bookworm
 
 function run_custom_build() {
@@ -18,13 +18,8 @@ function run_custom_build() {
 
     cd ${package_name}
 
-    if [ ! -f ".config" ]; then
-        make -j $((`nproc`-2)) defconfig ti_arm64_prune.config ti_rt.config
-    else
-        echo "The current working directory is: $(pwd)"
-        cp ../../../../ti-linux-kernel-rt/riaps.config kernel/configs/riaps.config
-        make -j $((`nproc`-2)) defconfig ti_arm64_prune.config ti_rt.config riaps.config
-    fi
+    cp ../../../../ti-linux-kernel-rt/riaps.config kernel/configs/riaps.config
+    make -j2 defconfig ti_arm64_prune.config ti_rt.config riaps.config
 
-    make -j $((`nproc`-2)) bindeb-pkg LOCALVERSION=-k3-rt
+    make -j2 bindeb-pkg LOCALVERSION=-k3-rt
 }
