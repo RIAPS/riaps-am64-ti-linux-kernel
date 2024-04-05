@@ -37,7 +37,10 @@ function run_custom_build() {
     cd ${package_name}
 
     cp ../../../../ti-linux-kernel-rt/riaps.config kernel/configs/riaps.config
-    ARCH=arm64 CROSS_COMPILE="$AARCH64_TOOL_LOC/aarch64-none-linux-gnu-" make -j2 defconfig ti_arm64_prune.config ti_rt.config riaps.config
+    cp ../../../../ti-linux-kernel-rt/custom-dts-files/*.dtbo arch/arm64/boot/dts/ti/.
+    cp ../../../../ti-linux-kernel-rt/custom-dts-files/*.dtb arch/arm64/boot/dts/ti/.
 
-    ARCH=arm64 CROSS_COMPILE="$AARCH64_TOOL_LOC/aarch64-none-linux-gnu-" make -j2 bindeb-pkg LOCALVERSION=-k3-rt
+    make ARCH=arm64 CROSS_COMPILE="$AARCH64_TOOL_LOC/aarch64-none-linux-gnu-" -j2 defconfig ti_arm64_prune.config ti_rt.config riaps.config
+    make ARCH=arm64 CROSS_COMPILE="$AARCH64_TOOL_LOC/aarch64-none-linux-gnu-" -j2 modules
+    make ARCH=arm64 CROSS_COMPILE="$AARCH64_TOOL_LOC/aarch64-none-linux-gnu-" -j2 bindeb-pkg LOCALVERSION=-k3-rt
 }
