@@ -36,28 +36,19 @@ function run_custom_build() {
     fi
 
     # Apply patches
-    echo "Debugging: ${PWD}"
-    echo "Top dir: ${topdir}"
-    echo "Build dir: ${builddir}"
-    ls ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel
     if [ -d ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel ]; then
         echo ">> ti-linux-kernel (${package_name}): patching .."
-        echo "KDEB_CHANGELOG_DIST: ${KDEB_CHANGELOG_DIST}"
-        cd "${builddir}/${package_name}"
-        ls 
+        cd "${builddir}/${package_name}" 
         git apply ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel/*
         cd "${builddir}"
-        echo ">> patch applied"
+        echo ">> ti-linux-kernel patches applied"
     fi
 
     cd ${package_name}
     echo ">> copy RIAPS configurations to kernel/configs .."
     cp ../../../../ti-linux-kernel-rt/riaps.config kernel/configs/riaps.config
-    #MM TODO: try using the ti-u-boot patch approach
-    #cp ../../../../ti-linux-kernel-rt/custom-dts-files/*.dtbo arch/arm64/boot/dts/ti/.
-    #cp ../../../../ti-linux-kernel-rt/custom-dts-files/*.dtb arch/arm64/boot/dts/ti/.
 
-    echo ">> compile kernel .."
+    echo ">> compiling kernel .."
     make ARCH=arm64 CROSS_COMPILE="$AARCH64_TOOL_LOC/aarch64-none-linux-gnu-" -j2 defconfig ti_arm64_prune.config ti_rt.config riaps.config
     make ARCH=arm64 CROSS_COMPILE="$AARCH64_TOOL_LOC/aarch64-none-linux-gnu-" -j2 bindeb-pkg LOCALVERSION=-k3-rt
 }
