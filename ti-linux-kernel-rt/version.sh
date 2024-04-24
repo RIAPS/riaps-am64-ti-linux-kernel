@@ -30,12 +30,20 @@ function setup_build_tools() {
 function run_custom_build() {
     setup_build_tools
     cd "${builddir}"
+    # Clone ti-linux-kernel
     if [ ! -d ${package_name} ]; then
         git clone "${git_repo}" -b "${release_tag}" --single-branch --depth=1 ${package_name}
     fi
 
-    cd ${package_name}
+    # Apply patches
+    if [ -d ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel ]; then
+        log ">> ti-linux-kernel (${package_name}): patching .."
+        cd "${builddir}"/${KDEB_CHANGELOG_DIST}/ti-linux-kernel-rt/${package_name}
+        git apply ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel/*
+        cd "${builddir}"
+    fi
 
+    cd ${package_name}
     cp ../../../../ti-linux-kernel-rt/riaps.config kernel/configs/riaps.config
     #MM TODO: try using the ti-u-boot patch approach
     #cp ../../../../ti-linux-kernel-rt/custom-dts-files/*.dtbo arch/arm64/boot/dts/ti/.
