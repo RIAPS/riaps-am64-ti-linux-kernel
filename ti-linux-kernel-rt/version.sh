@@ -38,11 +38,12 @@ function run_custom_build() {
     # Apply patches
     echo "Debugging: ${PWD}"
     echo "Top dir: ${topdir}"
+    echo "Build dir: ${builddir}"
     ls ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel
     if [ -d ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel ]; then
         echo ">> ti-linux-kernel (${package_name}): patching .."
         echo "KDEB_CHANGELOG_DIST: ${KDEB_CHANGELOG_DIST}"
-        cd "${KDEB_CHANGELOG_DIST}/ti-linux-kernel-rt/${package_name}"
+        cd "${builddir}/${KDEB_CHANGELOG_DIST}/ti-linux-kernel-rt/${package_name}"
         ls 
         git apply ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel/*
         cd "${builddir}"
