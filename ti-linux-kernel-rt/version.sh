@@ -35,10 +35,11 @@ function run_custom_build() {
         git clone "${git_repo}" -b "${release_tag}" --single-branch --depth=1 ${package_name}
     fi
 
-    # Apply patches
+    # Apply patches, reset the repo first in case a previous patch was applied
     if [ -d ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel ]; then
         echo ">> ti-linux-kernel (${package_name}): patching .."
         cd "${builddir}/${package_name}" 
+        git checkout .
         git apply ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel/*
         cd "${builddir}"
         echo ">> ti-linux-kernel patches applied"
@@ -46,7 +47,7 @@ function run_custom_build() {
 
     cd ${package_name}
     echo ">> copy RIAPS configurations to kernel/configs .."
-    cp ../../../../ti-linux-kernel-rt/riaps.config kernel/configs/riaps.config
+    cp ${topdir}/ti-linux-kernel-rt/riaps.config kernel/configs/riaps.config
 
     echo ">> compiling kernel .."
     make ARCH=arm64 CROSS_COMPILE="$AARCH64_TOOL_LOC/aarch64-none-linux-gnu-" -j2 defconfig ti_arm64_prune.config ti_rt.config riaps.config
