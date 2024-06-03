@@ -51,8 +51,6 @@ echo "Package Version: " $package_version
 echo "Last tested commit: " $last_tested_commit
 
 # Setup Build Tools
-toolchain_dir = ${topdir}/tools/
-
 if [ -d "${topdir}/tools" ]; then
     echo "Build tools already available in ${topdir}/tools"
 else
@@ -85,6 +83,21 @@ if [ ! -f "${builddir}/${package_full_ll}.orig.tar.gz" ]; then
       --absolute-names "${sourcedir}/${package_name}" \
       --transform "s,${sourcedir}/${package_name},${package_full},"
 fi
+
+# RIAPS: Apply patches and configurations
+# Apply patches, reset the repo first in case a previous patch was applied
+if [ -d ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel ]; then
+    echo ">> ti-linux-kernel (${package_name}): patching .."
+    cd "${builddir}/${package_name}" 
+    git checkout .
+    git apply ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel-rt/*
+    cd "${builddir}"
+    echo ">> ti-linux-kernel patches applied"
+fi
+
+cd ${package_name}
+echo ">> copy RIAPS configurations to kernel/configs .."
+cp ${topdir}/ti-linux-kernel-rt/riaps.config kernel/configs/riaps.config
 
 # Generate source package if none found
 if [ ! -f "${builddir}/${package_name}_${deb_version}.dsc" ]; then
