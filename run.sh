@@ -78,7 +78,7 @@ if [ ! -f "${builddir}/${package_full_ll}.orig.tar.gz" ]; then
     fi
     git -C "${sourcedir}/${package_name}" remote update
     git -C "${sourcedir}/${package_name}" checkout "${last_tested_commit}"
-    echo ">> Kernel source now available
+    echo ">> Kernel source now available"
 
     # RIAPS: Apply patches and configurations
     # Apply patches, reset the repo first in case a previous patch was applied
@@ -121,7 +121,7 @@ fi
 # Generate binary package for this arch if not found
 build_arch=$(dpkg --print-architecture)
 if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]; then
-    run_prep || true
+    #run_prep || true
 
     # Extract source package
     if [ ! -d "${builddir}/${package_name}_${deb_version}" ]; then
