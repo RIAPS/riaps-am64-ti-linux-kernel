@@ -78,26 +78,26 @@ if [ ! -f "${builddir}/${package_full_ll}.orig.tar.gz" ]; then
     fi
     git -C "${sourcedir}/${package_name}" remote update
     git -C "${sourcedir}/${package_name}" checkout "${last_tested_commit}"
+    echo ">> Kernel source now available
+
+    # RIAPS: Apply patches and configurations
+    # Apply patches, reset the repo first in case a previous patch was applied
+    if [ -d ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel ]; then
+        echo ">> ti-linux-kernel (${package_name}): patching .."
+        cd "${builddir}/${package_name}" 
+        git checkout .
+        git -C "${sourcedir}/${package_name}" apply ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel-rt/*
+        echo ">> ti-linux-kernel patches applied"
+    fi
+
+    echo ">> copy RIAPS configurations to kernel/configs .."
+    cp ${topdir}/ti-linux-kernel-rt/riaps.config ${sourcedir}/${package_name}"/kernel/configs/riaps.config
+
     tar -czf "${builddir}/${package_full_ll}.orig.tar.gz" \
       --exclude-vcs \
       --absolute-names "${sourcedir}/${package_name}" \
       --transform "s,${sourcedir}/${package_name},${package_full},"
 fi
-
-# RIAPS: Apply patches and configurations
-# Apply patches, reset the repo first in case a previous patch was applied
-if [ -d ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel ]; then
-    echo ">> ti-linux-kernel (${package_name}): patching .."
-    cd "${builddir}/${package_name}" 
-    git checkout .
-    git apply ${topdir}/ti-linux-kernel-rt/patches/ti-linux-kernel-rt/*
-    cd "${builddir}"
-    echo ">> ti-linux-kernel patches applied"
-fi
-
-cd ${package_name}
-echo ">> copy RIAPS configurations to kernel/configs .."
-cp ${topdir}/ti-linux-kernel-rt/riaps.config kernel/configs/riaps.config
 
 # Generate source package if none found
 if [ ! -f "${builddir}/${package_name}_${deb_version}.dsc" ]; then
