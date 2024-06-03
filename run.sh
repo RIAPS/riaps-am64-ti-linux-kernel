@@ -83,7 +83,7 @@ if [ ! -f "${builddir}/${package_full_ll}.orig.tar.gz" ]; then
     # RIAPS: Apply patches and configurations
     # Apply patches, reset the repo first in case a previous patch was applied
     if [ -d ${topdir}/ti-linux-kernel-rt/patches ]; then
-        echo ">> (${package_name}): patching .."
+        echo ">> ${package_name}: patching .."
         git -C "${sourcedir}/${package_name}" apply ${topdir}/ti-linux-kernel-rt/patches/*
         echo ">> ti-linux-kernel-rt patches applied"
     fi
