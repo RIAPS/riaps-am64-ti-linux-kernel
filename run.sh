@@ -63,8 +63,8 @@ else
         tar -Jxf arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
         rm arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
         echo "> Aarch64 Toolchain: available"
-        export AARCH64_TOOL_LOC="$PWD/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-linux-gnu/bin"
-        echo "$AARCH64_TOOL_LOC"
+        aarch64_tool_loc="$PWD/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-"
+        echo "$aarch64_tool_loc"
     else
         echo "> Aarch Toolchain: Failed to download. Exit code: $?"
     fi
@@ -133,7 +133,8 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]
 
     # Build binary package
     echo ">> Build binary package .."
-    (cd "${builddir}/${package_name}_${deb_version}" && debuild --no-lintian --no-sign -eCROSS_COMPILE="${AARCH64_TOOL_LOC}/aarch64-none-linux-gnu-" -aarm64 || true)
+    echo ">> CROSS_COMPILE = "${aarch64_tool_loc}"
+    (cd "${builddir}/${package_name}_${deb_version}" && CROSS_COMPILE="${aarch64_tool_loc}" debuild --no-lintian --no-sign -aarm64 || true)
 
     # Cleanup intermediate build directory
     #MM: keep files while debugging
