@@ -92,7 +92,7 @@ if [ ! -f "${builddir}/${package_full_ll}.orig.tar.gz" ]; then
     #echo ">> copy RIAPS configurations to kernel/configs .."
     #cp ${topdir}/ti-linux-kernel-rt/riaps.config ${sourcedir}/${package_name}/kernel/configs/riaps.config
 
-    echo ">> Tar downloaded kernel source code"
+    echo ">> Tar downloaded kernel source code .."
     tar -czf "${builddir}/${package_full_ll}.orig.tar.gz" \
       --exclude-vcs \
       --absolute-names "${sourcedir}/${package_name}" \
@@ -102,7 +102,7 @@ fi
 # Generate source package if none found
 if [ ! -f "${builddir}/${package_name}_${deb_version}.dsc" ]; then
     # Extract original source tarball
-    echo ">> Untar downloaded kernel source code into build directory
+    echo ">> Untar downloaded kernel source code into build directory .."
     tar -xzmf "${builddir}/${package_full_ll}.orig.tar.gz" -C "${builddir}"
 
     # Deploy our Debian control files
