@@ -133,7 +133,7 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]
 
     # Build binary package
     echo ">> Build binary package .."
-    (cd "${builddir}/${package_name}_${deb_version}" && CC="${aarch64_tool_loc}/gcc" debuild --no-lintian --no-sign -aarm64 || true)
+    (cd "${builddir}/${package_name}_${deb_version}" && export CC="${aarch64_tool_loc}/gcc" && debuild --no-lintian --no-sign -aarm64 || true)
 
     # Cleanup intermediate build directory
     #MM: keep files while debugging
