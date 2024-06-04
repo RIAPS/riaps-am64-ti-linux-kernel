@@ -128,12 +128,12 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]
     fi
 
     # Install build dependencies
-    echo ">> Install build dependencies .."
-    (cd "${builddir}/${package_name}_${deb_version}" && sudo mk-build-deps -ir --arch=arm64 -t "apt-get -o Debug::pkgProblemResolver=yes -y --no-install-recommends")
+    #echo ">> Install build dependencies .."
+    #(cd "${builddir}/${package_name}_${deb_version}" && sudo mk-build-deps -ir --arch=arm64 -t "apt-get -o Debug::pkgProblemResolver=yes -y --no-install-recommends")
 
     # Build binary package
     echo ">> Build binary package .."
-    (cd "${builddir}/${package_name}_${deb_version}" && sudo debuild --no-lintian --no-sign -aarm64 || true)
+    (cd "${builddir}/${package_name}_${deb_version}" && sudo debuild --no-lintian --no-sign -eCROSS_COMPILE="$AARCH64_TOOL_LOC/aarch64-none-linux-gnu-" -aarm64 || true)
 
     # Cleanup intermediate build directory
     #MM: keep files while debugging
