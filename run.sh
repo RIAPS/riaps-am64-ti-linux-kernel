@@ -92,6 +92,7 @@ if [ ! -f "${builddir}/${package_full_ll}.orig.tar.gz" ]; then
     #echo ">> copy RIAPS configurations to kernel/configs .."
     #cp ${topdir}/ti-linux-kernel-rt/riaps.config ${sourcedir}/${package_name}/kernel/configs/riaps.config
 
+    echo ">> Tar downloaded kernel source code"
     tar -czf "${builddir}/${package_full_ll}.orig.tar.gz" \
       --exclude-vcs \
       --absolute-names "${sourcedir}/${package_name}" \
@@ -101,38 +102,37 @@ fi
 # Generate source package if none found
 if [ ! -f "${builddir}/${package_name}_${deb_version}.dsc" ]; then
     # Extract original source tarball
+    echo ">> Untar downloaded kernel source code into build directory
     tar -xzmf "${builddir}/${package_full_ll}.orig.tar.gz" -C "${builddir}"
 
     # Deploy our Debian control files
     cp -rv "${debcontroldir}/debian" "${builddir}/${package_full}/"
 
     # Build source package
+    echo ">> Build source package .."
     (cd "${builddir}/${package_full}" && dpkg-source -b .)
 
     # Cleanup intermediate source directory
-    #MM: keep files while debugging
-    #rm -r "${builddir}/${package_full}"
+    rm -r "${builddir}/${package_full}"
 fi
 
-## Add default debian control files if none found
-#if [ ! -d "${builddir}/${package_full}/debian" ]; then
-#    (cd "${builddir}/${package_full}" && debmake)
-#fi
-
 # Generate binary package for this arch if not found
-build_arch=$(dpkg --print-architecture)
+build_arch="arm64"
 if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]; then
     #run_prep || true
 
     # Extract source package
     if [ ! -d "${builddir}/${package_name}_${deb_version}" ]; then
+        echo ">> Extract source package .."
         dpkg-source -x "${builddir}/${package_name}_${deb_version}.dsc" "${builddir}/${package_name}_${deb_version}"
     fi
 
     # Install build dependencies
+    echo ">> Install build dependencies .."
     (cd "${builddir}/${package_name}_${deb_version}" && sudo mk-build-deps -ir -t "apt-get -o Debug::pkgProblemResolver=yes -y --no-install-recommends")
 
     # Build binary package
+    echo ">> Build binary package .."
     (cd "${builddir}/${package_name}_${deb_version}" && sudo debuild --no-lintian --no-sign || true)
 
     # Cleanup intermediate build directory
