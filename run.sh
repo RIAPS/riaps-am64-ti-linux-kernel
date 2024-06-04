@@ -89,7 +89,7 @@ if [ ! -f "${builddir}/${package_full_ll}.orig.tar.gz" ]; then
     fi
 
     echo ">> copy RIAPS configurations to kernel/configs .."
-    cp ${topdir}/ti-linux-kernel-rt/riaps.config ${sourcedir}/${package_name}"/kernel/configs/riaps.config
+    cp ${topdir}/ti-linux-kernel-rt/riaps.config ${sourcedir}/${package_name}/kernel/configs/riaps.config
 
     tar -czf "${builddir}/${package_full_ll}.orig.tar.gz" \
       --exclude-vcs \
@@ -129,10 +129,10 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]
     fi
 
     # Install build dependencies
-    (cd "${builddir}/${package_name}_${deb_version}" && mk-build-deps -ir -t "apt-get -o Debug::pkgProblemResolver=yes -y --no-install-recommends")
+    (cd "${builddir}/${package_name}_${deb_version}" && sudo mk-build-deps -ir -t "apt-get -o Debug::pkgProblemResolver=yes -y --no-install-recommends")
 
     # Build binary package
-    (cd "${builddir}/${package_name}_${deb_version}" && debuild --no-lintian --no-sign || true)
+    (cd "${builddir}/${package_name}_${deb_version}" && sudo debuild --no-lintian --no-sign || true)
 
     # Cleanup intermediate build directory
     #MM: keep files while debugging
