@@ -117,9 +117,10 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}.dsc" ]; then
 fi
 
 # Generate binary package for this arch if not found
-build_arch="arm64"
+#build_arch="arm64"
+build_arch=$(dpkg --print-architecture)
 if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]; then
-    #run_prep || true
+    run_prep || true
 
     # Extract source package
     if [ ! -d "${builddir}/${package_name}_${deb_version}" ]; then
@@ -128,12 +129,20 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]
     fi
 
     # Install build dependencies
-    #echo ">> Install build dependencies .."
-    #(cd "${builddir}/${package_name}_${deb_version}" && mk-build-deps -ir --arch=arm64 -t "apt-get -o Debug::pkgProblemResolver=yes -y --no-install-recommends")
+    echo ">> Install build dependencies .."
+    (cd "${builddir}/${package_name}_${deb_version}" && mk-build-deps -ir --arch=arm64 -t "apt-get -o Debug::pkgProblemResolver=yes -y --no-install-recommends")
 
-    # Build binary package
-    echo ">> Build binary package .."
-    (cd "${builddir}/${package_name}_${deb_version}" && export CC="${aarch64_tool_loc}/gcc" && debuild --no-lintian --no-sign -aarm64 || true)
+    # Build binary package - older stuff
+    #echo ">> Build binary package .."
+    #(cd "${builddir}/${package_name}_${deb_version}" && export CC="${aarch64_tool_loc}/gcc" && debuild --no-lintian --no-sign -aarm64 || true)
+
+    # Build debian package.
+    # HACK: There is an issue with building source package for Linux Kernel. So only build binary packages for Linux.
+    if [[ "${package_name}" == "ti-linux-kernel"* ]]; then
+        (cd "${builddir}/${package_name}_${deb_version}" && debuild --no-lintian --no-sign -b || true)
+    else
+        (cd "${builddir}/${package_name}_${deb_version}" && debuild --no-lintian --no-sign -sa || true)
+    fi
 
     # Cleanup intermediate build directory
     #MM: keep files while debugging

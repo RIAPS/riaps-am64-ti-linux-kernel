@@ -7,3 +7,5 @@ Acknowledgement: This was created based on the TI Debian repo scripts in https:/
 ## To build a kernel on the AM64
 
 * Apt install `bc` and `rsync`
+
+>Note: The main branch is based on the original TI repo, but does not work in cross architecture setup (using Ubuntu 22.04).  The other branch is experimenting with builds on Jenkins.
