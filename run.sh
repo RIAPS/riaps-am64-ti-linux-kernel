@@ -50,25 +50,26 @@ echo "Deb Version: " $deb_version
 echo "Package Version: " $package_version
 echo "Last tested commit: " $last_tested_commit
 
+# For a build on AM64B system, no need for compile tools
 # Setup Build Tools
-if [ -d "${topdir}/tools" ]; then
-    echo "Build tools already available in ${topdir}/tools"
-else
-    mkdir -p ${topdir}/tools/
-    cd ${topdir}/tools/
-    echo "> Downloading Aarch64 Toolchain .."
-    wget https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz &>>/dev/null
-    if [ $? -eq 0 ]; then
-        echo "> Aarch64 Toolchain: downloaded .."
-        tar -Jxf arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
-        rm arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
-        echo "> Aarch64 Toolchain: available"
-        aarch64_tool_loc="$PWD/arm-gnu-toolchain-12.2.Rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-"
-        echo "$aarch64_tool_loc"
-    else
-        echo "> Aarch Toolchain: Failed to download. Exit code: $?"
-    fi
-fi
+#if [ -d "${topdir}/tools" ]; then
+#    echo "Build tools already available in ${topdir}/tools"
+#else
+#    mkdir -p ${topdir}/tools/
+#    cd ${topdir}/tools/
+#    echo "> Downloading Aarch64 Toolchain .."
+#    wget https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz &>>/dev/null
+#    if [ $? -eq 0 ]; then
+#        echo "> Aarch64 Toolchain: downloaded .."
+#        tar -Jxf arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
+#        rm arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
+#        echo "> Aarch64 Toolchain: available"
+#        aarch64_tool_loc="$PWD/arm-gnu-toolchain-12.2.Rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-"
+#        echo "$aarch64_tool_loc"
+#    else
+#        echo "> Aarch Toolchain: Failed to download. Exit code: $?"
+#    fi
+#fi
 
 # Generate original source tarball if none found
 if [ ! -f "${builddir}/${package_full_ll}.orig.tar.gz" ]; then
@@ -80,17 +81,16 @@ if [ ! -f "${builddir}/${package_full_ll}.orig.tar.gz" ]; then
     git -C "${sourcedir}/${package_name}" checkout "${last_tested_commit}"
     echo ">> Kernel source now available"
 
-    # MM TODO: comment out RIAPS and get original to build completely first
     # RIAPS: Apply patches and configurations
     # Apply patches, reset the repo first in case a previous patch was applied
-    #if [ -d ${topdir}/ti-linux-kernel-rt/patches ]; then
-    #    echo ">> ${package_name}: patching .."
-    #    git -C "${sourcedir}/${package_name}" apply ${topdir}/ti-linux-kernel-rt/patches/*
-    #    echo ">> ti-linux-kernel-rt patches applied"
-    #fi
+    if [ -d ${topdir}/ti-linux-kernel-rt/patches ]; then
+        echo ">> ${package_name}: patching .."
+        git -C "${sourcedir}/${package_name}" apply ${topdir}/ti-linux-kernel-rt/patches/*
+        echo ">> ti-linux-kernel-rt patches applied"
+    fi
 
-    #echo ">> copy RIAPS configurations to kernel/configs .."
-    #cp ${topdir}/ti-linux-kernel-rt/riaps.config ${sourcedir}/${package_name}/kernel/configs/riaps.config
+    echo ">> copy RIAPS configurations to kernel/configs .."
+    cp ${topdir}/ti-linux-kernel-rt/riaps.config ${sourcedir}/${package_name}/kernel/configs/riaps.config
 
     echo ">> Tar downloaded kernel source code .."
     tar -czf "${builddir}/${package_full_ll}.orig.tar.gz" \
@@ -130,7 +130,7 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]
 
     # Install build dependencies
     echo ">> Install build dependencies .."
-    (cd "${builddir}/${package_name}_${deb_version}" && mk-build-deps -ir --arch=arm64 -t "apt-get -o Debug::pkgProblemResolver=yes -y --no-install-recommends")
+    (cd "${builddir}/${package_name}_${deb_version}" && mk-build-deps -ir -t "apt-get -o Debug::pkgProblemResolver=yes -y --no-install-recommends")
 
     # Build binary package - older stuff
     #echo ">> Build binary package .."

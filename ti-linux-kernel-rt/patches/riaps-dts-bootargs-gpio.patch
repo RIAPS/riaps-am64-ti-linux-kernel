@@ -1,21 +1,20 @@
 diff --git a/arch/arm64/boot/dts/ti/k3-am642-evm.dts b/arch/arm64/boot/dts/ti/k3-am642-evm.dts
-index 4f78ca012..937cb51a2 100644
+index 4f78ca012c8e..debe00a8f224 100644
 --- a/arch/arm64/boot/dts/ti/k3-am642-evm.dts
 +++ b/arch/arm64/boot/dts/ti/k3-am642-evm.dts
 @@ -18,7 +18,7 @@ / {
- 
+
  	chosen {
  		stdout-path = "serial2:115200n8";
 -		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
 +		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor systemd.unified_cgroup_hierarchy=0";
  	};
- 
+
  	aliases {
-@@ -438,6 +438,14 @@ icssg1_iep0_pins_default: icssg1-iep0-pins-default {
+@@ -438,6 +438,13 @@ icssg1_iep0_pins_default: icssg1-iep0-pins-default {
  			AM64X_IOPAD(0x0104, PIN_OUTPUT, 2) /* (W7) PRG1_PRU0_GPO19.PRG1_IEP0_EDC_SYNC_OUT0 */
  		>;
  	};
-+
 +
 +	/* RIAPS GPIO Usage */
 +	mygpio0_pins_default: mygpio0_pins_default {
@@ -24,12 +23,12 @@ index 4f78ca012..937cb51a2 100644
 +		>;
 +	};
  };
- 
+
  &main_uart0 {
-@@ -490,6 +498,19 @@ display@3c {
- 	};
+@@ -451,6 +458,19 @@ &main_uart1 {
+ 	status = "reserved";
  };
- 
+
 +/* RIAPS GPIO Usage */
 +&main_gpio0 {
 +	pinctrl-names = "default";
@@ -43,23 +42,23 @@ index 4f78ca012..937cb51a2 100644
 +	};
 +};
 +
- /* mcu_gpio0 and mcu_gpio_intr are reserved for mcu firmware usage */
- &mcu_gpio0 {
- 	status = "reserved";
+ &main_i2c1 {
+ 	status = "okay";
+ 	pinctrl-names = "default";
 diff --git a/arch/arm64/boot/dts/ti/k3-am642-sk.dts b/arch/arm64/boot/dts/ti/k3-am642-sk.dts
-index 2325bd7b4..46cd9aa97 100644
+index 2325bd7b41bc..65185fa4dcf8 100644
 --- a/arch/arm64/boot/dts/ti/k3-am642-sk.dts
 +++ b/arch/arm64/boot/dts/ti/k3-am642-sk.dts
 @@ -18,7 +18,7 @@ / {
- 
+
  	chosen {
  		stdout-path = "serial2:115200n8";
 -		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
 +		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor systemd.unified_cgroup_hierarchy=0";
  	};
- 
+
  	memory@80000000 {
-@@ -357,6 +357,21 @@ AM64X_IOPAD(0x00ac, PIN_INPUT, 3) /* (R20) GPMC0_CSn1.EQEP0_I */
+@@ -357,6 +357,12 @@ AM64X_IOPAD(0x00ac, PIN_INPUT, 3) /* (R20) GPMC0_CSn1.EQEP0_I */
  			AM64X_IOPAD(0x00a8, PIN_INPUT, 3) /* (R19) GPMC0_CSn0.EQEP0_S */
  		>;
  	};
@@ -69,8 +68,13 @@ index 2325bd7b4..46cd9aa97 100644
 +			AM64X_IOPAD(0x00a4, PIN_OUTPUT, 7) /* (N17) GPMC0_DIR.GPIO0_40 */
 +		>;
 +	};
-+};
-+
+ };
+
+ &main_uart0 {
+@@ -370,6 +376,15 @@ &main_uart1 {
+ 	status = "reserved";
+ };
+
 +&main_gpio0 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&mygpio0_pins_default>;
@@ -78,6 +82,8 @@ index 2325bd7b4..46cd9aa97 100644
 +	gpio0-40 {
 +		gpios = <40 GPIO_ACTIVE_HIGH>;
 +	};
- };
- 
- &main_uart0 {
++};
++
+ &main_i2c1 {
+ 	status = "okay";
+ 	pinctrl-names = "default";
