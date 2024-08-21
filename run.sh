@@ -64,12 +64,13 @@ else
         tar -Jxf arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
         rm arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
         echo "> Aarch64 Toolchain: available"
-        export AARCH64_TOOL_LOC="$PWD/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-"
-        echo "$AARCH64_TOOL_LOC"
     else
         echo "> Aarch Toolchain: Failed to download. Exit code: $?"
     fi
 fi
+
+export AARCH64_TOOL_LOC="$PWD/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-"
+echo "$AARCH64_TOOL_LOC"
 
 # Generate original source tarball if none found
 if [ ! -f "${builddir}/${package_full_ll}.orig.tar.gz" ]; then
@@ -118,9 +119,7 @@ fi
 
 # Generate binary package for this arch if not found
 build_arch="arm64"
-#export DEB_BUILD_ARCH=arm64
-export CROSS_COMPILE=${AARCH64_TOOL_LOC}/aarch64-linux-gnu-
-#build_arch=$(dpkg --print-architecture)
+
 if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]; then
     run_prep || true
 
