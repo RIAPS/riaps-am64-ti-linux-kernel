@@ -7,7 +7,7 @@ index 4f78ca012c8e..ff19fd50547e 100644
         chosen {
                 stdout-path = "serial2:115200n8";
 -               bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
-+               bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor>
++               bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor systemd.unified_cgroup_hierarchy=0";
         };
 
         aliases {
@@ -22,7 +22,7 @@ index 4f78ca012c8e..ff19fd50547e 100644
         };
 
 @@ -438,6 +439,13 @@ icssg1_iep0_pins_default: icssg1-iep0-pins-default {
-                        AM64X_IOPAD(0x0104, PIN_OUTPUT, 2) /* (W7) PRG1_PRU0_GPO19.PRG1_IEP0_EDC_SYNC_OU>
+                        AM64X_IOPAD(0x0104, PIN_OUTPUT, 2) /* (W7) PRG1_PRU0_GPO19.PRG1_IEP0_EDC_SYNC_OUT0 */
                 >;
         };
 +
@@ -64,7 +64,7 @@ index 2325bd7b41bc..fb0fd3e95153 100644
         chosen {
                 stdout-path = "serial2:115200n8";
 -               bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
-+               bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor>
++               bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor systemd.unified_cgroup_hierarchy=0";
         };
 
         memory@80000000 {
