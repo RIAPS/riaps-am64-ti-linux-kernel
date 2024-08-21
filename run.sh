@@ -64,7 +64,7 @@ else
         tar -Jxf arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
         rm arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
         echo "> Aarch64 Toolchain: available"
-        AARCH64_TOOL_LOC="$PWD/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-"
+        export AARCH64_TOOL_LOC="$PWD/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-"
         echo "$AARCH64_TOOL_LOC"
     else
         echo "> Aarch Toolchain: Failed to download. Exit code: $?"
@@ -118,7 +118,8 @@ fi
 
 # Generate binary package for this arch if not found
 build_arch="arm64"
-export DEB_BUILD_ARCH=arm64
+#export DEB_BUILD_ARCH=arm64
+export CROSS_COMPILE=${AARCH64_TOOL_LOC}/aarch64-linux-gnu-
 #build_arch=$(dpkg --print-architecture)
 if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]; then
     run_prep || true
@@ -141,7 +142,8 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]
     # Build debian package.
     # HACK: There is an issue with building source package for Linux Kernel. So only build binary packages for Linux.
     if [[ "${package_name}" == "ti-linux-kernel"* ]]; then
-        (cd "${builddir}/${package_name}_${deb_version}" && export CC="${AARCH64_TOOL_LOC}/gcc" && debuild --no-lintian --no-sign -b || true)
+        (cd "${builddir}/${package_name}_${deb_version}" && debuild --no-lintian --no-sign -b || true)
+        #(cd "${builddir}/${package_name}_${deb_version}" && export CC="${AARCH64_TOOL_LOC}/gcc" && debuild --no-lintian --no-sign -b || true)
     else
         (cd "${builddir}/${package_name}_${deb_version}" && export CC="${AARCH64_TOOL_LOC}/gcc" && debuild --no-lintian --no-sign -sa || true)
     fi
