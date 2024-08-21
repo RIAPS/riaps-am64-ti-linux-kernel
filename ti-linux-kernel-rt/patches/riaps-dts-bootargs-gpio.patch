@@ -1,44 +1,44 @@
 diff --git a/arch/arm64/boot/dts/ti/k3-am642-evm.dts b/arch/arm64/boot/dts/ti/k3-am642-evm.dts
-index 4f78ca012c8e..ff19fd50547e 100644
+index 4f78ca012c8e..0c3e76528a8d 100644
 --- a/arch/arm64/boot/dts/ti/k3-am642-evm.dts
 +++ b/arch/arm64/boot/dts/ti/k3-am642-evm.dts
 @@ -18,7 +18,7 @@ / {
-
-        chosen {
-                stdout-path = "serial2:115200n8";
--               bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
-+               bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor systemd.unified_cgroup_hierarchy=0";
-        };
-
-        aliases {
+ 
+ 	chosen {
+ 		stdout-path = "serial2:115200n8";
+-		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
++		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor systemd.unified_cgroup_hierarchy=0";
+ 	};
+ 
+ 	aliases {
 @@ -391,7 +391,8 @@ AM64X_IOPAD(0x0008, PIN_INPUT, 0) /* (N19) OSPI0_DQS */
-
-        main_ecap0_pins_default: main-ecap0-pins-default {
-                pinctrl-single,pins = <
--                       AM64X_IOPAD(0x0270, PIN_INPUT, 0) /* (D18) ECAP0_IN_APWM_OUT */
-+                       AM64X_IOPAD(0x0270, PIN_OUTPUT, 1) /* (D18) ECAP0_IN_APWM_OUT */
-+                       AM64X_IOPAD(0x0274, PIN_OUTPUT, 1) /* (A19) EXT_REFCLK1 */
-                >;
-        };
-
+ 
+ 	main_ecap0_pins_default: main-ecap0-pins-default {
+ 		pinctrl-single,pins = <
+-			AM64X_IOPAD(0x0270, PIN_INPUT, 0) /* (D18) ECAP0_IN_APWM_OUT */
++			AM64X_IOPAD(0x0270, PIN_OUTPUT, 1) /* (D18) ECAP0_IN_APWM_OUT */
++                        AM64X_IOPAD(0x0274, PIN_OUTPUT, 1) /* (A19) EXT_REFCLK1 */
+ 		>;
+ 	};
+ 
 @@ -438,6 +439,13 @@ icssg1_iep0_pins_default: icssg1-iep0-pins-default {
-                        AM64X_IOPAD(0x0104, PIN_OUTPUT, 2) /* (W7) PRG1_PRU0_GPO19.PRG1_IEP0_EDC_SYNC_OUT0 */
-                >;
-        };
+ 			AM64X_IOPAD(0x0104, PIN_OUTPUT, 2) /* (W7) PRG1_PRU0_GPO19.PRG1_IEP0_EDC_SYNC_OUT0 */
+ 		>;
+ 	};
 +
-+       /* RIAPS GPIO Usage */
-+       mygpio0_pins_default: mygpio0_pins_default {
-+               pinctrl-single,pins = <
-+                       AM64X_IOPAD(0x00a4, PIN_OUTPUT, 7) /* (N17) GPMC0_DIR.GPIO0_40 */
-+               >;
-+       };
++        /* RIAPS GPIO Usage */
++        mygpio0_pins_default: mygpio0_pins_default {
++                pinctrl-single,pins = <
++                        AM64X_IOPAD(0x00a4, PIN_OUTPUT, 7) /* (N17) GPMC0_DIR.GPIO0_40 */
++                >;
++        };
  };
-
+ 
  &main_uart0 {
 @@ -451,6 +459,19 @@ &main_uart1 {
-        status = "reserved";
+ 	status = "reserved";
  };
-
+ 
 +/* RIAPS GPIO Usage */
 +&main_gpio0 {
 +       pinctrl-names = "default";
@@ -53,48 +53,48 @@ index 4f78ca012c8e..ff19fd50547e 100644
 +};
 +
  &main_i2c1 {
-        status = "okay";
-        pinctrl-names = "default";
+ 	status = "okay";
+ 	pinctrl-names = "default";
 diff --git a/arch/arm64/boot/dts/ti/k3-am642-sk.dts b/arch/arm64/boot/dts/ti/k3-am642-sk.dts
-index 2325bd7b41bc..fb0fd3e95153 100644
+index 2325bd7b41bc..92e4e16cd821 100644
 --- a/arch/arm64/boot/dts/ti/k3-am642-sk.dts
 +++ b/arch/arm64/boot/dts/ti/k3-am642-sk.dts
 @@ -18,7 +18,7 @@ / {
-
-        chosen {
-                stdout-path = "serial2:115200n8";
--               bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
-+               bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor systemd.unified_cgroup_hierarchy=0";
-        };
-
-        memory@80000000 {
+ 
+ 	chosen {
+ 		stdout-path = "serial2:115200n8";
+-		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
++		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor systemd.unified_cgroup_hierarchy=0";
+ 	};
+ 
+ 	memory@80000000 {
 @@ -328,7 +328,8 @@ AM64X_IOPAD(0x0008, PIN_INPUT, 0) /* (N19) OSPI0_DQS */
-
-        main_ecap0_pins_default: main-ecap0-pins-default {
-                pinctrl-single,pins = <
--                       AM64X_IOPAD(0x0270, PIN_INPUT, 0) /* (D18) ECAP0_IN_APWM_OUT */
-+                       AM64X_IOPAD(0x0270, PIN_OUTPUT, 1) /* (D18) ECAP0_IN_APWM_OUT */
-+                       AM64X_IOPAD(0x0274, PIN_OUTPUT, 1) /* (A19) EXT_REFCLK1 */
-                >;
-        };
-        main_wlan_en_pins_default: main-wlan-en-pins-default {
+ 
+ 	main_ecap0_pins_default: main-ecap0-pins-default {
+ 		pinctrl-single,pins = <
+-			AM64X_IOPAD(0x0270, PIN_INPUT, 0) /* (D18) ECAP0_IN_APWM_OUT */
++			AM64X_IOPAD(0x0270, PIN_OUTPUT, 1) /* (D18) ECAP0_IN_APWM_OUT */
++                        AM64X_IOPAD(0x0274, PIN_OUTPUT, 1) /* (A19) EXT_REFCLK1 */
+ 		>;
+ 	};
+ 	main_wlan_en_pins_default: main-wlan-en-pins-default {
 @@ -357,6 +358,12 @@ AM64X_IOPAD(0x00ac, PIN_INPUT, 3) /* (R20) GPMC0_CSn1.EQEP0_I */
-                        AM64X_IOPAD(0x00a8, PIN_INPUT, 3) /* (R19) GPMC0_CSn0.EQEP0_S */
-                >;
-        };
+ 			AM64X_IOPAD(0x00a8, PIN_INPUT, 3) /* (R19) GPMC0_CSn0.EQEP0_S */
+ 		>;
+ 	};
 +
-+       mygpio0_pins_default: mygpio0-pins-default {
-+               pinctrl-single,pins = <
-+                       AM64X_IOPAD(0x00a4, PIN_OUTPUT, 7) /* (N17) GPMC0_DIR.GPIO0_40 */
-+               >;
-+       };
++        mygpio0_pins_default: mygpio0-pins-default {
++                pinctrl-single,pins = <
++                        AM64X_IOPAD(0x00a4, PIN_OUTPUT, 7) /* (N17) GPMC0_DIR.GPIO0_40 */
++                >;
++        };
  };
-
-&main_uart0 {
-@@ -370,6 +377,15 @@ &main_uart1 {
-        status = "reserved";
+ 
+ &main_uart0 {
+@@ -370,6 +377,14 @@ &main_uart1 {
+ 	status = "reserved";
  };
-
+ 
 +&main_gpio0 {
 +       pinctrl-names = "default";
 +       pinctrl-0 = <&mygpio0_pins_default>;
@@ -103,8 +103,6 @@ index 2325bd7b41bc..fb0fd3e95153 100644
 +               gpios = <40 GPIO_ACTIVE_HIGH>;
 +       };
 +};
-+
  &main_i2c1 {
-        status = "okay";
-        pinctrl-names = "default";
-
+ 	status = "okay";
+ 	pinctrl-names = "default";

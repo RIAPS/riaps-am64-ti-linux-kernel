@@ -392,7 +392,7 @@
 	main_ecap0_pins_default: main-ecap0-pins-default {
 		pinctrl-single,pins = <
 			AM64X_IOPAD(0x0270, PIN_OUTPUT, 1) /* (D18) ECAP0_IN_APWM_OUT */
-			AM64X_IOPAD(0x0274, PIN_OUTPUT, 1) /* (A19) EXT_REFCLK1 */
+                        AM64X_IOPAD(0x0274, PIN_OUTPUT, 1) /* (A19) EXT_REFCLK1 */
 		>;
 	};
 
@@ -440,12 +440,12 @@
 		>;
 	};
 
-	/* RIAPS GPIO Usage */
-	mygpio0_pins_default: mygpio0_pins_default {
-		pinctrl-single,pins = <
-			AM64X_IOPAD(0x00a4, PIN_OUTPUT, 7) /* (N17) GPMC0_DIR.GPIO0_40 */
-		>;
-	};
+        /* RIAPS GPIO Usage */
+        mygpio0_pins_default: mygpio0_pins_default {
+                pinctrl-single,pins = <
+                        AM64X_IOPAD(0x00a4, PIN_OUTPUT, 7) /* (N17) GPMC0_DIR.GPIO0_40 */
+                >;
+        };
 };
 
 &main_uart0 {
@@ -461,15 +461,15 @@
 
 /* RIAPS GPIO Usage */
 &main_gpio0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&mygpio0_pins_default>;
+       pinctrl-names = "default";
+       pinctrl-0 = <&mygpio0_pins_default>;
 
-	gpio0_40 {
-		gpio-hog;
-		gpios = <40 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "mygpio0_40";
-	};
+       gpio0-40 {
+               gpio-hog;
+               gpios = <40 GPIO_ACTIVE_HIGH>;
+               output-high;
+               line-name = "mygpio0_40";
+       };
 };
 
 &main_i2c1 {
