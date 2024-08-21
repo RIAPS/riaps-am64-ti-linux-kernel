@@ -13,12 +13,12 @@
 #include "k3-am642.dtsi"
 
 / {
-	compatible =  "ti,am642-sk", "ti,am642";
+	compatible = "ti,am642-sk", "ti,am642";
 	model = "Texas Instruments AM642 SK";
 
 	chosen {
 		stdout-path = "serial2:115200n8";
-		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
+		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor systemd.unified_cgroup_hierarchy=0";
 	};
 
 	memory@80000000 {
@@ -231,21 +231,6 @@
 			gpios = <&exp2 7 GPIO_ACTIVE_HIGH>;
 		};
 	};
-
-	leds {
-		compatible = "gpio-leds";
-		pinctrl-names = "default";
-		pinctrl-0 = <&usr_led_pins_default>;
-
-		led-0 {
-			label = "am64-sk:green:heartbeat";
-			gpios = <&main_gpio0 60 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "heartbeat";
-			function = LED_FUNCTION_HEARTBEAT;
-			default-state = "off";
-		};
-	};
-
 };
 
 &main_pmx0 {
@@ -343,9 +328,11 @@
 
 	main_ecap0_pins_default: main-ecap0-pins-default {
 		pinctrl-single,pins = <
-			AM64X_IOPAD(0x0270, PIN_INPUT, 0) /* (D18) ECAP0_IN_APWM_OUT */
+			AM64X_IOPAD(0x0270, PIN_OUTPUT, 1) /* (D18) ECAP0_IN_APWM_OUT */
+			AM64X_IOPAD(0x0274, PIN_OUTPUT, 1) /* (A19) EXT_REFCLK1 */
 		>;
 	};
+	
 	main_wlan_en_pins_default: main-wlan-en-pins-default {
 		pinctrl-single,pins = <
 			AM64X_IOPAD(0x00c4, PIN_OUTPUT_PULLUP, 7) /* (V8) GPIO0_48 */
@@ -364,30 +351,12 @@
 		>;
 	};
 
-	main_bten_default: main-bten-default {
+	main_eqep0_pins_default: main-eqep0-pins-default {
 		pinctrl-single,pins = <
-			AM64X_IOPAD(0x00c8, PIN_OUTPUT, 7) /* (P17) GPIO0_49 */
-		>;
-	};
-
-	main_btuart_rts_sel_default: main-btuart-rts-sel-default {
-		pinctrl-single,pins = <
-			AM64X_IOPAD(0x100, PIN_OUTPUT, 7) /* (V7) GPIO0_63 */
-		>;
-	};
-
-	main_uart4_default: main-uart4-default {
-		pinctrl-single,pins = <
-			AM64X_IOPAD(0x250, PIN_INPUT, 1)	/* (A17) UART4_RXD */
-			AM64X_IOPAD(0x254, PIN_OUTPUT, 1)	/* (B17) UART4_TXD */
-			AM64X_IOPAD(0x64, PIN_INPUT, 2)		/* (R16) UART4_CTS */
-			AM64X_IOPAD(0x7c, PIN_OUTPUT, 2)	/* (R17) UART4_RTS */
-		>;
-	};
-
-	usr_led_pins_default: usr-led-pins-default {
-		pinctrl-single,pins = <
-			AM64X_IOPAD(0x0F4, PIN_OUTPUT, 7) /* (Y9) PRG1_PRU0_GPO15.GPIO0_60 */
+			AM64X_IOPAD(0x00a0, PIN_INPUT, 3) /* (N16) GPMC0_WPn.EQEP0_A */
+			AM64X_IOPAD(0x00a4, PIN_INPUT, 3) /* (N17) GPMC0_DIR.EQEP0_B */
+			AM64X_IOPAD(0x00ac, PIN_INPUT, 3) /* (R20) GPMC0_CSn1.EQEP0_I */
+			AM64X_IOPAD(0x00a8, PIN_INPUT, 3) /* (R19) GPMC0_CSn0.EQEP0_S */
 		>;
 	};
 
@@ -396,35 +365,10 @@
 			AM64X_IOPAD(0x00a4, PIN_OUTPUT, 7) /* (N17) GPMC0_DIR.GPIO0_40 */
 		>;
 	};
-
-};
-
-&main_gpio0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&main_btuart_rts_sel_default &mygpio0_pins_default>;
-
-	gpio0-63 {
-		gpio-hog;
-		gpios = <63 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "btuart_rts_sel";
-	};
-
-	gpio0-40 {
-		gpios = <40 GPIO_ACTIVE_HIGH>;
-	};
-
-};
-
-&mcu_uart0 {
-	status = "disabled";
-};
-
-&mcu_uart1 {
-	status = "disabled";
 };
 
 &main_uart0 {
+	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_uart0_pins_default>;
 };
@@ -434,42 +378,17 @@
 	status = "reserved";
 };
 
-&main_uart2 {
-	status = "disabled";
-};
-
-&main_uart3 {
-	status = "disabled";
-};
-
-&main_uart4 {
+&main_gpio0 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&main_uart4_default &main_bten_default>;
-	status = "okay";
+	pinctrl-0 = <&mygpio0_pins_default>;
 
-	bluetooth {
-		compatible = "ti,wl1835-st";
-		enable-gpios = <&main_gpio0 49 GPIO_ACTIVE_HIGH>;
+	gpio0_40 {
+		gpios = <40 GPIO_ACTIVE_HIGH>;
 	};
 };
 
-&main_uart5 {
-	status = "disabled";
-};
-
-&main_uart6 {
-	status = "disabled";
-};
-
-&mcu_i2c0 {
-	status = "disabled";
-};
-
-&mcu_i2c1 {
-	status = "disabled";
-};
-
 &main_i2c1 {
+	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_i2c1_pins_default>;
 	clock-frequency = <400000>;
@@ -494,24 +413,17 @@
 	};
 };
 
-&main_i2c3 {
-	status = "disabled";
-};
-
-&mcu_spi0 {
-	status = "disabled";
-};
-
-&mcu_spi1 {
-	status = "disabled";
-};
-
-/* mcu_gpio0 is reserved for mcu firmware usage */
+/* mcu_gpio0 and mcu_gpio_intr are reserved for mcu firmware usage */
 &mcu_gpio0 {
 	status = "reserved";
 };
 
+&mcu_gpio_intr {
+	status = "reserved";
+};
+
 &sdhci0 {
+	status = "okay";
 	vmmc-supply = <&wlan_en>;
 	bus-width = <4>;
 	non-removable;
@@ -533,20 +445,15 @@
 
 &sdhci1 {
 	/* SD/MMC */
+	status = "okay";
 	vmmc-supply = <&vdd_mmc1>;
 	pinctrl-names = "default";
-	bus-width = <4>;
 	pinctrl-0 = <&main_mmc1_pins_default>;
-	ti,driver-strength-ohm = <50>;
 	disable-wp;
 };
 
 &serdes_ln_ctrl {
 	idle-states = <AM64_SERDES0_LANE0_USB>;
-};
-
-&serdes_wiz0 {
-	status = "okay";
 };
 
 &serdes0 {
@@ -574,10 +481,10 @@
 
 &cpsw3g {
 	pinctrl-names = "default";
-	pinctrl-0 = <&mdio1_pins_default
-		     &rgmii1_pins_default
+	pinctrl-0 = <&rgmii1_pins_default
 		     &rgmii2_pins_default>;
 
+	/* Map HW8_TS_PUSH to GENF1 */
 	cpts@3d000 {
 		ti,pps = <7 1>;
 	};
@@ -594,6 +501,10 @@
 };
 
 &cpsw3g_mdio {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&mdio1_pins_default>;
+
 	cpsw3g_phy0: ethernet-phy@0 {
 		reg = <0>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
@@ -607,20 +518,66 @@
 	};
 };
 
-#define TS_OFFSET(pa, val)     (0x4+(pa)*4) (0x10000 | val)
+&tscadc0 {
+	status = "disabled";
+};
 
-&timesync_router {
+&ospi0 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&mcu_cpts_pps>;
+	pinctrl-0 = <&ospi0_pins_default>;
 
-	/* Example of the timesync routing */
-	mcu_cpts_pps: mcu-cpts-pps {
-		pinctrl-single,pins = <
-				/* pps [cpts genf1] in22 -> out37 [cpts hw8_push] */
-				TS_OFFSET(37, 22)
-				/* pps [cpts genf1] in22 -> out25 [SYNC1_OUT pin] */
-				TS_OFFSET(25, 22)
-				>;
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0x0>;
+		spi-tx-bus-width = <8>;
+		spi-rx-bus-width = <8>;
+		spi-max-frequency = <25000000>;
+		cdns,tshsl-ns = <60>;
+		cdns,tsd2d-ns = <60>;
+		cdns,tchsh-ns = <60>;
+		cdns,tslch-ns = <60>;
+		cdns,read-delay = <4>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "ospi.tiboot3";
+				reg = <0x0 0x100000>;
+			};
+
+			partition@100000 {
+				label = "ospi.tispl";
+				reg = <0x100000 0x200000>;
+			};
+
+			partition@300000 {
+				label = "ospi.u-boot";
+				reg = <0x300000 0x400000>;
+			};
+
+			partition@700000 {
+				label = "ospi.env";
+				reg = <0x700000 0x40000>;
+			};
+
+			partition@740000 {
+				label = "ospi.env.backup";
+				reg = <0x740000 0x40000>;
+			};
+
+			partition@800000 {
+				label = "ospi.rootfs";
+				reg = <0x800000 0x37c0000>;
+			};
+
+			partition@3fc0000 {
+				label = "ospi.phypattern";
+				reg = <0x3fc0000 0x40000>;
+			};
+		};
 	};
 };
 
@@ -667,14 +624,6 @@
 	status = "disabled";
 };
 
-&pcie0_rc {
-	status = "disabled";
-};
-
-&pcie0_ep {
-	status = "disabled";
-};
-
 &main_r5fss0_core0 {
 	mboxes = <&mailbox0_cluster2 &mbox_main_r5fss0_core0>;
 	memory-region = <&main_r5fss0_core0_dma_memory_region>,
@@ -705,49 +654,38 @@
 			<&mcu_m4fss_memory_region>;
 };
 
-&tscadc0 {
-	status = "disabled";
-};
-
-&ospi0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&ospi0_pins_default>;
-
-	flash@0{
-		compatible = "jedec,spi-nor";
-		reg = <0x0>;
-		spi-tx-bus-width = <8>;
-		spi-rx-bus-width = <8>;
-		spi-max-frequency = <25000000>;
-		cdns,tshsl-ns = <60>;
-		cdns,tsd2d-ns = <60>;
-		cdns,tchsh-ns = <60>;
-		cdns,tslch-ns = <60>;
-		cdns,read-delay = <4>;
-		cdns,phy-mode;
-		#address-cells = <1>;
-		#size-cells = <1>;
-	};
-};
-
-&main_mcan0 {
-	status = "disabled";
-};
-
-&main_mcan1 {
-	status = "disabled";
-};
-
-&icssg0_mdio {
-	status = "disabled";
-};
-
-&icssg1_mdio {
-	status = "disabled";
-};
-
 &ecap0 {
+	status = "okay";
 	/* PWM is available on Pin 1 of header J3 */
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_ecap0_pins_default>;
+};
+
+&eqep0 {
+	/* EQEP0_A is available on Pin 18 of header J4 */
+	/* EQEP0_B is available on Pin 22 of header J4 */
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&main_eqep0_pins_default>;
+};
+
+#define TS_OFFSET(pa, val)     (0x4+(pa)*4) (0x10000 | val)
+
+&timesync_router {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&cpsw_cpts_pps>;
+
+	/*
+	 * Use Time Sync Router to map GENF1 input to HW8_TS_PUSH output as well
+	 * as the PRU ICSSG0 SYNC1 output.
+	 */
+	cpsw_cpts_pps: cpsw-cpts-pps {
+		pinctrl-single,pins = <
+			/* pps [cpts genf1] in22 -> out37 [cpts hw8_push] */
+			TS_OFFSET(37, 22)
+			/* pps [cpts genf1] in22 -> out26 [SYNC1_OUT pin] */
+			TS_OFFSET(26, 22)
+			>;
+	};
 };

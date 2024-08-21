@@ -13,12 +13,12 @@
 #include "k3-am642.dtsi"
 
 / {
-	compatible =  "ti,am642-evm", "ti,am642";
+	compatible = "ti,am642-evm", "ti,am642";
 	model = "Texas Instruments AM642 EVM";
 
 	chosen {
 		stdout-path = "serial2:115200n8";
-		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
+		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor systemd.unified_cgroup_hierarchy=0";
 	};
 
 	aliases {
@@ -239,8 +239,9 @@
 				      <2>,
 				      <2>;
 
-		mii-g-rt = <&icssg1_mii_g_rt>;
-		mii-rt = <&icssg1_mii_rt>;
+		ti,mii-g-rt = <&icssg1_mii_g_rt>;
+		ti,mii-rt = <&icssg1_mii_rt>;
+		ti,pa-stats = <&icssg1_pa_stats>;
 		iep = <&icssg1_iep0>,  <&icssg1_iep1>;
 
 		interrupt-parent = <&icssg1_intc>;
@@ -261,54 +262,28 @@
 		       <&main_pktdma 0x4203 0>; /* mgmnt rsp slice 1 */
 		dma-names = "tx0-0", "tx0-1", "tx0-2", "tx0-3",
 			    "tx1-0", "tx1-1", "tx1-2", "tx1-3",
-			    "rx0", "rx1",
-			    "rxmgm0", "rxmgm1";
+			    "rx0", "rx1";
 
-		icssg1_emac0: ethernet-mii0 {
-			phy-handle = <&icssg1_phy1>;
-			phy-mode = "rgmii-rxid";
-			syscon-rgmii-delay = <&main_conf 0x4110>;
-			/* Filled in by bootloader */
-			local-mac-address = [00 00 00 00 00 00];
-		};
-
-		icssg1_emac1: ethernet-mii1 {
-			syscon-rgmii-delay = <&main_conf 0x4114>;
-			/* Filled in by bootloader */
-			local-mac-address = [00 00 00 00 00 00];
-			status = "disabled";
+		ethernet-ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			icssg1_emac0: port@0 {
+				reg = <0>;
+				phy-handle = <&icssg1_phy1>;
+				phy-mode = "rgmii-id";
+				ti,syscon-rgmii-delay = <&main_conf 0x4110>;
+				/* Filled in by bootloader */
+				local-mac-address = [00 00 00 00 00 00];
+			};
+			icssg1_emac1: port@1 {
+				reg = <1>;
+				ti,syscon-rgmii-delay = <&main_conf 0x4114>;
+				/* Filled in by bootloader */
+				local-mac-address = [00 00 00 00 00 00];
+				status = "disabled";
+			};
 		};
 	};
-};
-
-&main_r5fss0_core0 {
-	mboxes = <&mailbox0_cluster2 &mbox_main_r5fss0_core0>;
-	memory-region = <&main_r5fss0_core0_dma_memory_region>,
-			<&main_r5fss0_core0_memory_region>;
-};
-
-&main_r5fss0_core1 {
-	mboxes = <&mailbox0_cluster2 &mbox_main_r5fss0_core1>;
-	memory-region = <&main_r5fss0_core1_dma_memory_region>,
-			<&main_r5fss0_core1_memory_region>;
-};
-
-&main_r5fss1_core0 {
-	mboxes = <&mailbox0_cluster4 &mbox_main_r5fss1_core0>;
-	memory-region = <&main_r5fss1_core0_dma_memory_region>,
-			<&main_r5fss1_core0_memory_region>;
-};
-
-&main_r5fss1_core1 {
-	mboxes = <&mailbox0_cluster4 &mbox_main_r5fss1_core1>;
-	memory-region = <&main_r5fss1_core1_dma_memory_region>,
-			<&main_r5fss1_core1_memory_region>;
-};
-
-&mcu_m4fss {
-	mboxes = <&mailbox0_cluster6 &mbox_m4_0>;
-	memory-region = <&mcu_m4fss_dma_memory_region>,
-			<&mcu_m4fss_memory_region>;
 };
 
 &main_pmx0 {
@@ -414,6 +389,13 @@
 		>;
 	};
 
+	main_ecap0_pins_default: main-ecap0-pins-default {
+		pinctrl-single,pins = <
+			AM64X_IOPAD(0x0270, PIN_OUTPUT, 1) /* (D18) ECAP0_IN_APWM_OUT */
+			AM64X_IOPAD(0x0274, PIN_OUTPUT, 1) /* (A19) EXT_REFCLK1 */
+		>;
+	};
+
 	main_mcan0_pins_default: main-mcan0-pins-default {
 		pinctrl-single,pins = <
 			AM64X_IOPAD(0x0254, PIN_INPUT, 0) /* (B17) MCAN0_RX */
@@ -458,12 +440,7 @@
 		>;
 	};
 
-	main_ecap0_pins_default: main-ecap0-pins-default {
-		pinctrl-single,pins = <
-			AM64X_IOPAD(0x0270, PIN_INPUT, 0) /* (D18) ECAP0_IN_APWM_OUT */
-		>;
-	};
-
+	/* RIAPS GPIO Usage */
 	mygpio0_pins_default: mygpio0_pins_default {
 		pinctrl-single,pins = <
 			AM64X_IOPAD(0x00a4, PIN_OUTPUT, 7) /* (N17) GPMC0_DIR.GPIO0_40 */
@@ -472,6 +449,7 @@
 };
 
 &main_uart0 {
+	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_uart0_pins_default>;
 };
@@ -481,35 +459,21 @@
 	status = "reserved";
 };
 
-&main_uart2 {
-	status = "disabled";
-};
+/* RIAPS GPIO Usage */
+&main_gpio0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&mygpio0_pins_default>;
 
-&main_uart3 {
-	status = "disabled";
-};
-
-&main_uart4 {
-	status = "disabled";
-};
-
-&main_uart5 {
-	status = "disabled";
-};
-
-&main_uart6 {
-	status = "disabled";
-};
-
-&mcu_uart0 {
-	status = "disabled";
-};
-
-&mcu_uart1 {
-	status = "disabled";
+	gpio0_40 {
+		gpio-hog;
+		gpios = <40 GPIO_ACTIVE_HIGH>;
+		output-high;
+		line-name = "mygpio0_40";
+	};
 };
 
 &main_i2c1 {
+	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_i2c1_pins_default>;
 	clock-frequency = <400000>;
@@ -547,43 +511,20 @@
 	};
 };
 
-&main_gpio0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&mygpio0_pins_default>;
-
-	gpio0-40 {
-		gpio-hog;
-		gpios = <40 GPIO_ACTIVE_HIGH>;
-		output-high;
-		line-name = "mygpio0_40";
-	};
-};
-
-/* mcu_gpio0 is reserved for mcu firmware usage */
+/* mcu_gpio0 and mcu_gpio_intr are reserved for mcu firmware usage */
 &mcu_gpio0 {
 	status = "reserved";
 };
 
-&mcu_i2c0 {
-	status = "disabled";
-};
-
-&mcu_i2c1 {
-	status = "disabled";
-};
-
-&mcu_spi0 {
-	status = "disabled";
-};
-
-&mcu_spi1 {
-	status = "disabled";
+&mcu_gpio_intr {
+	status = "reserved";
 };
 
 &main_spi0 {
+	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_spi0_pins_default>;
-	ti,pindir-d0-out-d1-in = <1>;
+	ti,pindir-d0-out-d1-in;
 	eeprom@0 {
 		compatible = "microchip,93lc46b";
 		reg = <0>;
@@ -595,7 +536,7 @@
 
 &sdhci0 {
 	/* emmc */
-	bus-width = <8>;
+	status = "okay";
 	non-removable;
 	ti,driver-strength-ohm = <50>;
 	disable-wp;
@@ -603,11 +544,10 @@
 
 &sdhci1 {
 	/* SD/MMC */
+	status = "okay";
 	vmmc-supply = <&vdd_mmc1>;
 	pinctrl-names = "default";
-	bus-width = <4>;
 	pinctrl-0 = <&main_mmc1_pins_default>;
-	ti,driver-strength-ohm = <50>;
 	disable-wp;
 };
 
@@ -625,10 +565,10 @@
 
 &cpsw3g {
 	pinctrl-names = "default";
-	pinctrl-0 = <&mdio1_pins_default
-		     &rgmii1_pins_default
+	pinctrl-0 = <&rgmii1_pins_default
 		     &rgmii2_pins_default>;
 
+	/* Map HW8_TS_PUSH to GENF1 */
 	cpts@3d000 {
 		ti,pps = <7 1>;
 	};
@@ -645,6 +585,10 @@
 };
 
 &cpsw3g_mdio {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&mdio1_pins_default>;
+
 	cpsw3g_phy0: ethernet-phy@0 {
 		reg = <0>;
 		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
@@ -652,20 +596,67 @@
 	};
 };
 
-#define TS_OFFSET(pa, val)     (0x4+(pa)*4) (0x10000 | val)
+&tscadc0 {
+	/* ADC is reserved for R5 usage */
+	status = "reserved";
+};
 
-&timesync_router {
+&ospi0 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&mcu_cpts_pps>;
+	pinctrl-0 = <&ospi0_pins_default>;
 
-	/* Example of the timesync routing */
-	mcu_cpts_pps: mcu-cpts-pps {
-		pinctrl-single,pins = <
-				/* pps [cpts genf1] in22 -> out37 [cpts hw8_push] */
-				TS_OFFSET(37, 22)
-				/* pps [cpts genf1] in22 -> out25 [SYNC1_OUT pin] */
-				TS_OFFSET(25, 22)
-				>;
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0x0>;
+		spi-tx-bus-width = <8>;
+		spi-rx-bus-width = <8>;
+		spi-max-frequency = <25000000>;
+		cdns,tshsl-ns = <60>;
+		cdns,tsd2d-ns = <60>;
+		cdns,tchsh-ns = <60>;
+		cdns,tslch-ns = <60>;
+		cdns,read-delay = <4>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "ospi.tiboot3";
+				reg = <0x0 0x100000>;
+			};
+
+			partition@100000 {
+				label = "ospi.tispl";
+				reg = <0x100000 0x200000>;
+			};
+
+			partition@300000 {
+				label = "ospi.u-boot";
+				reg = <0x300000 0x400000>;
+			};
+
+			partition@700000 {
+				label = "ospi.env";
+				reg = <0x700000 0x40000>;
+			};
+
+			partition@740000 {
+				label = "ospi.env.backup";
+				reg = <0x740000 0x40000>;
+			};
+
+			partition@800000 {
+				label = "ospi.rootfs";
+				reg = <0x800000 0x37c0000>;
+			};
+
+			partition@3fc0000 {
+				label = "ospi.phypattern";
+				reg = <0x3fc0000 0x40000>;
+			};
+		};
 	};
 };
 
@@ -712,6 +703,36 @@
 	status = "disabled";
 };
 
+&main_r5fss0_core0 {
+	mboxes = <&mailbox0_cluster2 &mbox_main_r5fss0_core0>;
+	memory-region = <&main_r5fss0_core0_dma_memory_region>,
+			<&main_r5fss0_core0_memory_region>;
+};
+
+&main_r5fss0_core1 {
+	mboxes = <&mailbox0_cluster2 &mbox_main_r5fss0_core1>;
+	memory-region = <&main_r5fss0_core1_dma_memory_region>,
+			<&main_r5fss0_core1_memory_region>;
+};
+
+&main_r5fss1_core0 {
+	mboxes = <&mailbox0_cluster4 &mbox_main_r5fss1_core0>;
+	memory-region = <&main_r5fss1_core0_dma_memory_region>,
+			<&main_r5fss1_core0_memory_region>;
+};
+
+&main_r5fss1_core1 {
+	mboxes = <&mailbox0_cluster4 &mbox_main_r5fss1_core1>;
+	memory-region = <&main_r5fss1_core1_dma_memory_region>,
+			<&main_r5fss1_core1_memory_region>;
+};
+
+&mcu_m4fss {
+	mboxes = <&mailbox0_cluster6 &mbox_m4_0>;
+	memory-region = <&mcu_m4fss_dma_memory_region>,
+			<&mcu_m4fss_memory_region>;
+};
+
 &serdes_ln_ctrl {
 	idle-states = <AM64_SERDES0_LANE0_PCIE0>;
 };
@@ -727,6 +748,7 @@
 };
 
 &pcie0_rc {
+	status = "okay";
 	reset-gpios = <&exp1 5 GPIO_ACTIVE_HIGH>;
 	phys = <&serdes0_pcie_link>;
 	phy-names = "pcie-phy";
@@ -737,52 +759,31 @@
 	phys = <&serdes0_pcie_link>;
 	phy-names = "pcie-phy";
 	num-lanes = <1>;
-	status = "disabled";
 };
 
-&tscadc0 {
-	/* ADC is reserved for R5 usage */
-	status = "reserved";
-};
-
-&ospi0 {
+&ecap0 {
+	status = "okay";
+	/* PWM is available on Pin 1 of header J12 */
 	pinctrl-names = "default";
-	pinctrl-0 = <&ospi0_pins_default>;
-
-	flash@0{
-		compatible = "jedec,spi-nor";
-		reg = <0x0>;
-		spi-tx-bus-width = <8>;
-		spi-rx-bus-width = <8>;
-		spi-max-frequency = <25000000>;
-		cdns,tshsl-ns = <60>;
-		cdns,tsd2d-ns = <60>;
-		cdns,tchsh-ns = <60>;
-		cdns,tslch-ns = <60>;
-		cdns,read-delay = <4>;
-		cdns,phy-mode;
-		#address-cells = <1>;
-		#size-cells = <1>;
-	};
+	pinctrl-0 = <&main_ecap0_pins_default>;
 };
 
 &main_mcan0 {
+	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_mcan0_pins_default>;
 	phys = <&transceiver1>;
 };
 
 &main_mcan1 {
+	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&main_mcan1_pins_default>;
 	phys = <&transceiver2>;
 };
 
-&icssg0_mdio {
-	status = "disabled";
-};
-
 &icssg1_mdio {
+	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&icssg1_mdio1_pins_default>;
 
@@ -793,13 +794,28 @@
 	};
 };
 
+#define TS_OFFSET(pa, val)     (0x4+(pa)*4) (0x10000 | val)
+
+&timesync_router {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&cpsw_cpts_pps>;
+
+	/*
+	 * Use Time Sync Router to map GENF1 input to HW8_TS_PUSH output as well
+	 * as the PRU ICSSG0 SYNC1 output.
+	 */
+	cpsw_cpts_pps: cpsw-cpts-pps {
+		pinctrl-single,pins = <
+			/* pps [cpts genf1] in22 -> out37 [cpts hw8_push] */
+			TS_OFFSET(37, 22)
+			/* pps [cpts genf1] in22 -> out26 [SYNC1_OUT pin] */
+			TS_OFFSET(26, 22)
+			>;
+	};
+};
+
 &icssg1_iep0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&icssg1_iep0_pins_default>;
-};
-
-&ecap0 {
-	/* PWM is available on Pin 1 of header J12 */
-	pinctrl-names = "default";
-	pinctrl-0 = <&main_ecap0_pins_default>;
 };
