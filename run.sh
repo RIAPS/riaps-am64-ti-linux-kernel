@@ -52,24 +52,24 @@ echo "Last tested commit: " $last_tested_commit
 
 # For a build on AM64B system, no need for compile tools
 # Setup Build Tools
-#if [ -d "${topdir}/tools" ]; then
-#    echo "Build tools already available in ${topdir}/tools"
-#else
-#    mkdir -p ${topdir}/tools/
-#    cd ${topdir}/tools/
-#    echo "> Downloading Aarch64 Toolchain .."
-#    wget https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz &>>/dev/null
-#    if [ $? -eq 0 ]; then
-#        echo "> Aarch64 Toolchain: downloaded .."
-#        tar -Jxf arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
-#        rm arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
-#        echo "> Aarch64 Toolchain: available"
-#        aarch64_tool_loc="$PWD/arm-gnu-toolchain-12.2.Rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-"
-#        echo "$aarch64_tool_loc"
-#    else
-#        echo "> Aarch Toolchain: Failed to download. Exit code: $?"
-#    fi
-#fi
+if [ -d "${topdir}/tools" ]; then
+    echo "Build tools already available in ${topdir}/tools"
+else
+    mkdir -p ${topdir}/tools/
+    cd ${topdir}/tools/
+    echo "> Downloading Aarch64 Toolchain .."
+    wget https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz &>>/dev/null
+    if [ $? -eq 0 ]; then
+        echo "> Aarch64 Toolchain: downloaded .."
+        tar -Jxf arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
+        rm arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
+        echo "> Aarch64 Toolchain: available"
+        AARCH64_TOOL_LOC="$PWD/arm-gnu-toolchain-13.2.Rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-"
+        echo "$AARCH64_TOOL_LOC"
+    else
+        echo "> Aarch Toolchain: Failed to download. Exit code: $?"
+    fi
+fi
 
 # Generate original source tarball if none found
 if [ ! -f "${builddir}/${package_full_ll}.orig.tar.gz" ]; then
@@ -117,8 +117,9 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}.dsc" ]; then
 fi
 
 # Generate binary package for this arch if not found
-#build_arch="arm64"
-build_arch=$(dpkg --print-architecture)
+build_arch="arm64"
+export DEB_BUILD_ARCH=arm64
+#build_arch=$(dpkg --print-architecture)
 if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]; then
     run_prep || true
 
