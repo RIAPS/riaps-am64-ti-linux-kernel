@@ -682,8 +682,8 @@
 		pinctrl-single,pins = <
 			/* pps [cpts genf1] in22 -> out37 [cpts hw8_push] */
 			TS_OFFSET(37, 22)
-			/* pps [cpts genf1] in22 -> out26 [SYNC1_OUT pin] */
-			TS_OFFSET(26, 22)
+			/* pps [cpts genf1] in22 -> out24 [SYNC0_OUT pin] */
+			TS_OFFSET(24, 22)
 			>;
 	};
 };

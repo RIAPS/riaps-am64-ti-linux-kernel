@@ -123,8 +123,8 @@ index 2325bd7b41bc..18dcfc8f3e81 100644
  			TS_OFFSET(37, 22)
 -			/* pps [cpts genf1] in22 -> out26 [SYNC1_OUT pin] */
 -			TS_OFFSET(26, 22)
-+			/* pps [cpts genf1] in22 -> out25 [SYNC1_OUT pin] */
-+			TS_OFFSET(25, 22)
++			/* pps [cpts genf1] in22 -> out24 [SYNC0_OUT pin] */
++			TS_OFFSET(24, 22)
  			>;
  	};
  };
