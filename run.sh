@@ -152,4 +152,5 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]
     # Cleanup intermediate build directory
     #MM: keep files while debugging
     #rm -r "${builddir}/${package_name}_${deb_version}"
+    git -C "${sourcedir}/${package_name}" checkout arch/arm64/boot/dts/ti/k3-am642-*.dts
 fi
