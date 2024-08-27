@@ -10,7 +10,7 @@ fi
 
 source debian_version.sh
 
-DEB_SUITE="${DEB_SUITE:-$DEBSUITE}"
+DEB_SUITE="${DEB_SUITE:-$deb_suite}"
 
 topdir=$(git rev-parse --show-toplevel)
 projdir="${topdir}/$1"

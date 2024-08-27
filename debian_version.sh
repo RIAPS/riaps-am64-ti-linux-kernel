@@ -1,1 +1,1 @@
-export DEBSUITE="bookworm"
+export deb_suite="bookworm"
