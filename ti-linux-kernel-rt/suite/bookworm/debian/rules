@@ -6,15 +6,15 @@ srctree ?= .
 
 build-indep:
 build-arch:
-	$(MAKE) ARCH=arm64 CROSS_COMPILE=$(CROSS_COMPILE) -j4 KERNELRELEASE=6.1.83-k3-rt KBUILD_BUILD_VERSION=1 -f $(srctree)/Makefile defconfig ti_arm64_prune.config ti_rt.config riaps.config
-	$(MAKE) ARCH=arm64 CROSS_COMPILE=$(CROSS_COMPILE) -j4 KERNELRELEASE=6.1.83-k3-rt KBUILD_BUILD_VERSION=1 -f $(srctree)/Makefile
+	$(MAKE) ARCH=arm64 CROSS_COMPILE=$(CROSS_COMPILE) -j2 V=1 KERNELRELEASE=6.1.83-k3-rt KBUILD_BUILD_VERSION=1 -f $(srctree)/Makefile defconfig ti_arm64_prune.config ti_rt.config riaps.config
+	$(MAKE) ARCH=arm64 CROSS_COMPILE=$(CROSS_COMPILE) -j2 V=1 KERNELRELEASE=6.1.83-k3-rt KBUILD_BUILD_VERSION=1 -f $(srctree)/Makefile
 
 
 build: build-arch
 
 binary-indep:
 binary-arch: build-arch
-	DEB_HOST_ARCH=arm64 $(MAKE) ARCH=arm64 CROSS_COMPILE=$(CROSS_COMPILE) -j4 KERNELRELEASE=6.1.83-k3-rt KBUILD_BUILD_VERSION=1 -f $(srctree)/Makefile intdeb-pkg
+	DEB_HOST_ARCH=arm64 $(MAKE) ARCH=arm64 CROSS_COMPILE=$(CROSS_COMPILE) -j2 V=1 KERNELRELEASE=6.1.83-k3-rt KBUILD_BUILD_VERSION=1 -f $(srctree)/Makefile intdeb-pkg
 
 
 clean:
