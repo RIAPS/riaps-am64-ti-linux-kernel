@@ -143,7 +143,7 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]
     # Build debian package.
     # HACK: There is an issue with building source package for Linux Kernel. So only build binary packages for Linux.
     if [[ "${package_name}" == "ti-linux-kernel"* ]]; then
-        echo "Package: ${package_name}
+        echo "Package: ${package_name}"
         (cd "${builddir}/${package_name}_${deb_version}" && DEB_HOST_ARCH=arm64 DEB_BUILD_OPTIONS=verbose debuild --no-lintian --no-sign -b || true)
     else
         echo "MM: This should not be used"
