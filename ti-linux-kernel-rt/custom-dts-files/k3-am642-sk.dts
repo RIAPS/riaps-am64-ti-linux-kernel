@@ -681,10 +681,16 @@
 	status = "okay";
 	pinctrl-names = "default";
 	pinctrl-0 = <&rpi_spi0_pins_default>;
-	rpi_spi0 {
+	ti,spi-num-cs = <2>;
+	spidev@0 {
 			spi-max-frequency = <1000000>;
 			reg = <0>;
-			compatible = "rohm,dh2228fv";
+			compatible = "spidev";
+	};
+	spidev@1 {
+			spi-max-frequency = <1000000>;
+			reg = <1>;
+			compatible = "spidev";
 	};
 };
 
