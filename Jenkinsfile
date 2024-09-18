@@ -25,7 +25,7 @@ pipeline {
       steps {
         script {
           // Start ARM64 Debian container
-          def arm64Container = sh(script: 'docker run --rm -id ghcr.io/texasinstruments/debian-arm64:latest', returnStdout: true).trim()
+          def arm64Container = sh(script: 'sudo docker run --rm -id ghcr.io/texasinstruments/debian-arm64:latest', returnStdout: true).trim()
 
           // Clone the git repository into the container and navigate to the directory
           sh "sudo docker exec ${arm64Container} bash -c 'git clone https://github.com/RIAPS/riaps-am64-ti-linux-kernel.git /tmp/riaps-am64-ti-linux-kernel'"
@@ -38,7 +38,7 @@ pipeline {
           sh "sudo docker exec ${arm64Container} bash -c 'source /tmp/riaps-am64-ti-linux-kernel/debian_version.sh'"
     
           // Use the DEBIAN_SUITE environment variable in the docker cp command
-          def debianSuite = sh(script: "docker exec ${arm64Container} bash -c 'echo \$deb_suite'", returnStdout: true).trim()
+          def debianSuite = sh(script: "sudo docker exec ${arm64Container} bash -c 'echo \$deb_suite'", returnStdout: true).trim()
           sh "sudo docker cp ${arm64Container}:/tmp/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/*.deb ${HOST_OUTPUT_DIR}"
           sh "sudo docker cp ${arm64Container}:/tmp/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/*.buildinfo ${HOST_OUTPUT_DIR}"
           sh "sudo docker cp ${arm64Container}:/tmp/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/*.changes ${HOST_OUTPUT_DIR}"
