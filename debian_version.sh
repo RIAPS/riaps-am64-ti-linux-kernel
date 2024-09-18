@@ -1,0 +1,1 @@
+export deb_suite="bookworm"

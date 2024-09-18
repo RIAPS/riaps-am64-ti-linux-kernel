@@ -8,7 +8,8 @@ if [ "$#" -eq 0 ]; then
     exit 1
 fi
 
-DEB_SUITE="${DEB_SUITE:-bookworm}"
+source debian_version.sh
+DEB_SUITE="${DEB_SUITE:-$deb_suite}"
 
 topdir=$(git rev-parse --show-toplevel)
 projdir="${topdir}/$1"
@@ -25,12 +26,6 @@ fi
 source ${projdir}/version.sh
 
 mkdir -p ${builddir}
-
-# RIAPS: Added to allow customization of the kernel config/dts
-#if $custom_build ; then
-#    run_custom_build
-#    exit 0
-#fi
 
 package_name=$(cd ${debcontroldir} && dpkg-parsechangelog --show-field Source)
 deb_version=$(cd ${debcontroldir} && dpkg-parsechangelog --show-field Version)
@@ -49,27 +44,6 @@ echo "Package name: " $package_name
 echo "Deb Version: " $deb_version
 echo "Package Version: " $package_version
 echo "Last tested commit: " $last_tested_commit
-
-# For a build on AM64B system, no need for compile tools
-# Setup Build Tools
-#if [ -d "${topdir}/tools" ]; then
-#    echo "Build tools already available in ${topdir}/tools"
-#else
-#    mkdir -p ${topdir}/tools/
-#    cd ${topdir}/tools/
-#    echo "> Downloading Aarch64 Toolchain .."
-#    wget https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz &>>/dev/null
-#    if [ $? -eq 0 ]; then
-#        echo "> Aarch64 Toolchain: downloaded .."
-#        tar -Jxf arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
-#        rm arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz
-#        echo "> Aarch64 Toolchain: available"
-#        aarch64_tool_loc="$PWD/arm-gnu-toolchain-12.2.Rel1-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-"
-#        echo "$aarch64_tool_loc"
-#    else
-#        echo "> Aarch Toolchain: Failed to download. Exit code: $?"
-#    fi
-#fi
 
 # Generate original source tarball if none found
 if [ ! -f "${builddir}/${package_full_ll}.orig.tar.gz" ]; then
@@ -117,7 +91,6 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}.dsc" ]; then
 fi
 
 # Generate binary package for this arch if not found
-#build_arch="arm64"
 build_arch=$(dpkg --print-architecture)
 if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]; then
     run_prep || true
@@ -132,10 +105,6 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]
     echo ">> Install build dependencies .."
     (cd "${builddir}/${package_name}_${deb_version}" && mk-build-deps -ir -t "apt-get -o Debug::pkgProblemResolver=yes -y --no-install-recommends")
 
-    # Build binary package - older stuff
-    #echo ">> Build binary package .."
-    #(cd "${builddir}/${package_name}_${deb_version}" && export CC="${aarch64_tool_loc}/gcc" && debuild --no-lintian --no-sign -aarm64 || true)
-
     # Build debian package.
     # HACK: There is an issue with building source package for Linux Kernel. So only build binary packages for Linux.
     if [[ "${package_name}" == "ti-linux-kernel"* ]]; then
@@ -147,4 +116,6 @@ if [ ! -f "${builddir}/${package_name}_${deb_version}_${build_arch}.buildinfo" ]
     # Cleanup intermediate build directory
     #MM: keep files while debugging
     #rm -r "${builddir}/${package_name}_${deb_version}"
+    echo "Reset ${sourcedir}/${package_name} repository ..."
+    git -C "${sourcedir}/${package_name}" checkout arch/arm64/boot/dts/ti/k3-am642-*.dts
 fi
