@@ -33,7 +33,7 @@ pipeline {
 
           // Update RIAPS repo for run ('run.sh' will update the ti kernel for the version desired)
           //sh "sudo docker exec ${riapsArm64Container} bash -c 'git clone https://github.com/RIAPS/riaps-am64-ti-linux-kernel.git /home/riaps/riaps-am64-ti-linux-kernel'"
-          sh "sudo docker exec ${riapsArm64Container} bash -c 'cd /home/riaps/riaps-am64-ti-linux-kernel && git pull"
+          sh "sudo docker exec ${riapsArm64Container} bash -c 'cd /home/riaps/riaps-am64-ti-linux-kernel && git pull'"
           // Create kernel image debian packages
           sh "sudo docker exec ${riapsArm64Container} bash -c 'cd /home/riaps/riaps-am64-ti-linux-kernel && ./run.sh ti-linux-kernel-rt'"
 
