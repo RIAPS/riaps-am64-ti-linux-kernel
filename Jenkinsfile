@@ -12,7 +12,7 @@ pipeline {
       steps {
         // Pull the required Docker images
         sh 'sudo docker pull multiarch/qemu-user-static'
-        sh 'sudo docker load -i ~/RIAPS/riaps-ti-debian-arm64-docker.tar'
+        sh 'sudo docker load -i ~/RIAPS/riaps-ti-debian-arm64-bookworm-docker.tar'
         // Original docker pulled to create the above tar file
         // Added the RIAPS/riaps-am64-ti-linux-kernel and ti kernel repos to image
         // Note:  The ti kernel repo took over 9 hours to clone
@@ -29,7 +29,7 @@ pipeline {
       steps {
         script {
           // Start ARM64 Debian container
-          def riapsArm64Container = sh(script: 'sudo docker run --rm -id riaps-ghcr.io/texasinstruments/debian-arm64:latest', returnStdout: true).trim()
+          def riapsArm64Container = sh(script: 'sudo docker run --rm -id riaps/ghcr.io/texasinstruments/debian-arm64:bookworm', returnStdout: true).trim()
 
           // Update RIAPS repo for run ('run.sh' will update the ti kernel for the version desired)
           //sh "sudo docker exec ${riapsArm64Container} bash -c 'git clone https://github.com/RIAPS/riaps-am64-ti-linux-kernel.git /home/riaps/riaps-am64-ti-linux-kernel'"
