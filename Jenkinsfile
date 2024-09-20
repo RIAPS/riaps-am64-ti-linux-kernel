@@ -32,19 +32,19 @@ pipeline {
           def riapsArm64Container = sh(script: 'sudo docker run --rm -id riaps/ghcr.io/texasinstruments/debian-arm64:bookworm', returnStdout: true).trim()
 
           // Update RIAPS repo for run ('run.sh' will update the ti kernel for the version desired)
-          //sh "sudo docker exec ${riapsArm64Container} bash -c 'git clone https://github.com/RIAPS/riaps-am64-ti-linux-kernel.git /home/riaps/riaps-am64-ti-linux-kernel'"
           sh "sudo docker exec ${riapsArm64Container} bash -c 'cd /home/riaps/riaps-am64-ti-linux-kernel && git pull'"
-          // Create kernel image debian packages
+
+          // Grab the Debian codename from the "debian_version.sh"
+          def debianSuite = sh(script: "sudo docker exec ${riapsArm64Container} /bin/bash -c 'source /home/riaps/riaps-am64-ti-linux-kernel/debian_version.sh && echo \$deb_suite'", returnStdout: true).trim()
+          echo "Debian Codename: ${debianSuite}"
+
+          // Create kernel image debian packages and build the device tree files
           sh "sudo docker exec ${riapsArm64Container} bash -c 'cd /home/riaps/riaps-am64-ti-linux-kernel && ./run.sh ti-linux-kernel-rt'"
 
           // Prepare the output directory on the host
           sh "mkdir -p ${HOST_OUTPUT_DIR}"
 
-          // Source debian_version.sh to get the DEBIAN_SUITE environment variable
-          sh "sudo docker exec ${riapsArm64Container} bash -c 'source /home/riaps/riaps-am64-ti-linux-kernel/debian_version.sh'"
-    
           // Use the DEBIAN_SUITE environment variable in the docker cp command
-          def debianSuite = sh(script: "sudo docker exec ${riapsArm64Container} bash -c 'echo \$deb_suite'", returnStdout: true).trim()
           sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/*.deb ${HOST_OUTPUT_DIR}"
           sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/*.buildinfo ${HOST_OUTPUT_DIR}"
           sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/*.changes ${HOST_OUTPUT_DIR}"
