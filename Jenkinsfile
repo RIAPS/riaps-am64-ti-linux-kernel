@@ -25,7 +25,7 @@ pipeline {
         sh 'sudo docker run --rm --privileged multiarch/qemu-user-static --reset -p yes'
       }
     }
-    stage('Run ARM64 Container') {
+    stage('Build TI ARM64 Kernel') {
       steps {
         script {
           // Start ARM64 Debian container
@@ -45,9 +45,9 @@ pipeline {
           sh "mkdir -p ${HOST_OUTPUT_DIR}"
 
           // Use the DEBIAN_SUITE environment variable in the docker cp command
-          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/*.deb ${HOST_OUTPUT_DIR}"
-          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/*.buildinfo ${HOST_OUTPUT_DIR}"
-          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/*.changes ${HOST_OUTPUT_DIR}"
+          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/linux-*.deb ${HOST_OUTPUT_DIR}"
+          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/ti-linux-kernel-rt_*.buildinfo ${HOST_OUTPUT_DIR}"
+          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/ti-linux-kernel-rt_*.changes ${HOST_OUTPUT_DIR}"
           sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/ti-linux-kernel-rt*/arch/arm64/boot/dts/ti/k3-am642-sk.* ${HOST_OUTPUT_DIR}"
         }
       }
