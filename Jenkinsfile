@@ -34,21 +34,29 @@ pipeline {
           // Update RIAPS repo for run ('run.sh' will update the ti kernel for the version desired)
           sh "sudo docker exec ${riapsArm64Container} bash -c 'cd /home/riaps/riaps-am64-ti-linux-kernel && git pull'"
 
-          // Grab the Debian codename from the "debian_version.sh"
+          // Grab the Debian codename, release version and kernel version from the "debian_version.sh"
           def debianSuite = sh(script: "sudo docker exec ${riapsArm64Container} /bin/bash -c 'source /home/riaps/riaps-am64-ti-linux-kernel/debian_version.sh && echo \$deb_suite'", returnStdout: true).trim()
           echo "Debian Codename: ${debianSuite}"
+          def relVersion = sh(script: "sudo docker exec ${riapsArm64Container} /bin/bash -c 'source /home/riaps/riaps-am64-ti-linux-kernel/debian_version.sh && echo \$rel_version'", returnStdout: true).trim()
+          echo "Release Version: ${relVersion}"
+          def kernelVersion = sh(script: "sudo docker exec ${riapsArm64Container} /bin/bash -c 'source /home/riaps/riaps-am64-ti-linux-kernel/debian_version.sh && echo \$kernel_version'", returnStdout: true).trim()
+          echo "Kernel Version: ${kernelVersion}"
 
           // Create kernel image debian packages and build the device tree files
           sh "sudo docker exec ${riapsArm64Container} bash -c 'cd /home/riaps/riaps-am64-ti-linux-kernel && ./run.sh ti-linux-kernel-rt'"
 
           // Prepare the output directory on the host
-          sh "mkdir -p ${HOST_OUTPUT_DIR}"
+          //sh "mkdir -p ${HOST_OUTPUT_DIR}"
 
           // Use the DEBIAN_SUITE environment variable in the docker cp command
-          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/linux-*.deb ${HOST_OUTPUT_DIR}"
-          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/ti-linux-kernel-rt_*.buildinfo ${HOST_OUTPUT_DIR}"
-          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/ti-linux-kernel-rt_*.changes ${HOST_OUTPUT_DIR}"
-          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/ti-linux-kernel-rt*/arch/arm64/boot/dts/ti/k3-am642-sk.* ${HOST_OUTPUT_DIR}"
+          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/linux-headers-kernelVersion_relVersion_arm64.deb ${HOST_OUTPUT_DIR}"
+          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/linux-image-kernelVersion-dbg_relVersion_arm64.deb ${HOST_OUTPUT_DIR}"
+          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/linux-image-kernelVersion_relVersion_arm64.deb ${HOST_OUTPUT_DIR}"
+          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/linux-libc-dev_relVersion_arm64.deb ${HOST_OUTPUT_DIR}"
+          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/ti-linux-kernel-rt_relVersion_arm64.buildinfo ${HOST_OUTPUT_DIR}"
+          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/ti-linux-kernel-rt_relVersion_arm64.changes ${HOST_OUTPUT_DIR}"
+          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/ti-linux-kernel-rt_relVersion/arch/arm64/boot/dts/ti/k3-am642-sk.dts ${HOST_OUTPUT_DIR}"
+          sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/ti-linux-kernel-rt_relVersion/arch/arm64/boot/dts/ti/k3-am642-sk.dtb ${HOST_OUTPUT_DIR}"
         }
       }
     }
