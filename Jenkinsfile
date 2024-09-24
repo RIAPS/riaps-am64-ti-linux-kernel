@@ -2,7 +2,7 @@ pipeline {
   agent any
   environment {
     // Define an env variable for the directory where artifacts will be copied to on the host
-    HOST_OUTPUT_DIR = "${WORKSPACE}/build"
+    HOST_OUTPUT_DIR = "${WORKSPACE}/build_artifacts"
   }
   options {
     buildDiscarder logRotator(daysToKeepStr: '60', numToKeepStr: '30')
@@ -46,7 +46,7 @@ pipeline {
           sh "sudo docker exec ${riapsArm64Container} bash -c 'cd /home/riaps/riaps-am64-ti-linux-kernel && ./run.sh ti-linux-kernel-rt'"
 
           // Prepare the output directory on the host
-          //sh "mkdir -p ${HOST_OUTPUT_DIR}"
+          sh "mkdir -p ${HOST_OUTPUT_DIR}"
 
           // Use the DEBIAN_SUITE environment variable in the docker cp command
           sh "sudo docker cp ${riapsArm64Container}:/home/riaps/riaps-am64-ti-linux-kernel/build/${debianSuite}/ti-linux-kernel-rt/linux-headers-${kernelVersion}_${relVersion}_arm64.deb ${HOST_OUTPUT_DIR}"
