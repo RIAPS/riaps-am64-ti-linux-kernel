@@ -65,7 +65,7 @@ pipeline {
   post {
     success {
       // Archive the artifacts after a successful build
-      archiveArtifacts artifacts: "${HOST_OUTPUT_DIR}/*", fingerprint: true
+      archiveArtifacts artifacts: "build_artifacts/*", fingerprint: true
     }
     always {
       // Clean up and provide a message that the pipeline has completed
