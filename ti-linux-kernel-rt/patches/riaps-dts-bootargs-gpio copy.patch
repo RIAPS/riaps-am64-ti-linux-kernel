@@ -1,30 +1,29 @@
-diff --git a/arch/arm64/boot/dts/ti/k3-am642-sk.dts b/arch/arm64/boot/dts/ti/k3-am642-sk.dts
-index 2325bd7b41bc..f9b00eea7ad7 100644
---- a/arch/arm64/boot/dts/ti/k3-am642-sk.dts
-+++ b/arch/arm64/boot/dts/ti/k3-am642-sk.dts
-@@ -18,7 +18,7 @@ / {
+diff --git a/arch/arm/dts/k3-am642-sk.dts b/arch/arm/dts/k3-am642-sk.dts
+index d4721e3a4e4..b8e02f1393e 100644
+--- a/arch/arm/dts/k3-am642-sk.dts
++++ b/arch/arm/dts/k3-am642-sk.dts
+@@ -19,6 +19,7 @@
  
  	chosen {
- 		stdout-path = "serial2:115200n8";
--		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
+ 		stdout-path = &main_uart0;
 +		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor systemd.unified_cgroup_hierarchy=0";
  	};
  
- 	memory@80000000 {
-@@ -328,7 +328,8 @@ AM64X_IOPAD(0x0008, PIN_INPUT, 0) /* (N19) OSPI0_DQS */
+ 	aliases {
+@@ -367,7 +368,8 @@
  
- 	main_ecap0_pins_default: main-ecap0-pins-default {
+ 	main_ecap0_pins_default: main-ecap0-default-pins {
  		pinctrl-single,pins = <
 -			AM64X_IOPAD(0x0270, PIN_INPUT, 0) /* (D18) ECAP0_IN_APWM_OUT */
 +			AM64X_IOPAD(0x0270, PIN_OUTPUT, 1) /* (D18) ECAP0_IN_APWM_OUT */
-+                        AM64X_IOPAD(0x0274, PIN_OUTPUT, 1) /* (A19) EXT_REFCLK1 */
++			AM64X_IOPAD(0x0274, PIN_OUTPUT, 1) /* (A19) EXT_REFCLK1 */ 
  		>;
  	};
- 	main_wlan_en_pins_default: main-wlan-en-pins-default {
-@@ -357,6 +358,22 @@ AM64X_IOPAD(0x00ac, PIN_INPUT, 3) /* (R20) GPMC0_CSn1.EQEP0_I */
- 			AM64X_IOPAD(0x00a8, PIN_INPUT, 3) /* (R19) GPMC0_CSn0.EQEP0_S */
+ 
+@@ -386,6 +388,23 @@
  		>;
  	};
+ 
 +
 +	mygpio0_pins_default: mygpio0-pins-default {
 +			pinctrl-single,pins = <
@@ -41,13 +40,15 @@ index 2325bd7b41bc..f9b00eea7ad7 100644
 +			AM64X_IOPAD(0x0218, PIN_OUTPUT, 0) /* A14 SPI0_D1.SPI0_D1 */
 +		>;
 +	};
++
+ 	main_com8_ls_en_pins_default: main-com8-ls-en-default-pins {
+ 		pinctrl-single,pins = <
+ 			AM64X_IOPAD(0x00fc, PIN_OUTPUT, 7) /* (U7) PRG1_PRU0_GPO17.GPIO0_62 */
+@@ -410,6 +429,15 @@
+ 	pinctrl-0 = <&main_uart0_pins_default>;
+ 	current-speed = <115200>;
  };
- 
- &main_uart0 {
-@@ -370,6 +387,14 @@ &main_uart1 {
- 	status = "reserved";
- };
- 
++ 
 +&main_gpio0 {
 +       pinctrl-names = "default";
 +       pinctrl-0 = <&mygpio0_pins_default>;
@@ -56,11 +57,11 @@ index 2325bd7b41bc..f9b00eea7ad7 100644
 +               gpios = <40 GPIO_ACTIVE_HIGH>;
 +       };
 +};
- &main_i2c1 {
- 	status = "okay";
- 	pinctrl-names = "default";
-@@ -652,6 +677,23 @@ &eqep0 {
- 	pinctrl-0 = <&main_eqep0_pins_default>;
+ 
+ &main_uart1 {
+ 	/* main_uart1 is reserved for firmware usage */
+@@ -460,6 +488,24 @@
+ 	};
  };
  
 +&main_spi0 {
@@ -80,19 +81,18 @@ index 2325bd7b41bc..f9b00eea7ad7 100644
 +	};
 +};
 +
- #define TS_OFFSET(pa, val)     (0x4+(pa)*4) (0x10000 | val)
- 
- &timesync_router {
-@@ -667,8 +709,8 @@ cpsw_cpts_pps: cpsw-cpts-pps {
++
+ /* mcu_gpio0 and mcu_gpio_intr are reserved for mcu firmware usage */
+ &mcu_gpio0 {
+ 	status = "reserved";
+@@ -740,8 +786,8 @@
  		pinctrl-single,pins = <
  			/* pps [cpts genf1] in22 -> out37 [cpts hw8_push] */
  			TS_OFFSET(37, 22)
 -			/* pps [cpts genf1] in22 -> out26 [SYNC1_OUT pin] */
 -			TS_OFFSET(26, 22)
-+			/* pps [cpts genf1] in22 -> out24 [SYNC0_OUT pin] */
++			/* pps [cpts genf1] in22 -> out24 [SYNC1_OUT pin] */
 +			TS_OFFSET(24, 22)
  			>;
  	};
--};
-+};
-\ No newline at end of file
+ };
