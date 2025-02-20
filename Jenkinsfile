@@ -33,7 +33,10 @@ pipeline {
 
           // Update RIAPS repo for run ('run.sh' will update the ti kernel for the version desired)
           sh "sudo docker exec ${env.RIAPS_ARM64_CONTAINER_ID} bash -c 'cd /home/riaps/riaps-am64-ti-linux-kernel && git pull'"
-
+          
+          // Checkout `develop-trixie` branch - NOTE: this step is specific to this branch
+          sh "sudo docker exec ${env.RIAPS_ARM64_CONTAINER_ID} bash -c 'cd /home/riaps/riaps-am64-ti-linux-kernel && git checkout develop-trixie'"
+          
           // Grab the Debian codename, release version and kernel version from the "debian_version.sh"
           def debianSuite = sh(script: "sudo docker exec ${env.RIAPS_ARM64_CONTAINER_ID} /bin/bash -c 'source /home/riaps/riaps-am64-ti-linux-kernel/debian_version.sh && echo \$deb_suite'", returnStdout: true).trim()
           echo "Debian Codename: ${debianSuite}"
