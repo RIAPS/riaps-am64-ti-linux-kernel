@@ -29,7 +29,7 @@ pipeline {
       steps {
         script {
           // Start ARM64 Debian container
-          env.RIAPS_ARM64_CONTAINER_ID = sh(script: 'sudo docker run --rm -id riaps-ghcr.io/texasinstruments/debian-arm64:latest', returnStdout: true).trim()
+          env.RIAPS_ARM64_CONTAINER_ID = sh(script: 'sudo docker run --rm -id riaps/ghcr.io/texasinstruments/debian-arm64:trixie', returnStdout: true).trim()
 
           // Update RIAPS repo for run ('run.sh' will update the ti kernel for the version desired)
           sh "sudo docker exec ${env.RIAPS_ARM64_CONTAINER_ID} bash -c 'cd /home/riaps/riaps-am64-ti-linux-kernel && git pull'"
