@@ -16,6 +16,11 @@
 	compatible = "ti,am642-sk", "ti,am642";
 	model = "Texas Instruments AM642 SK";
 
+	aliases {
+		i2c1 = &main_i2c1;
+		i2c2 = &main_i2c2;
+	};
+	
 	chosen {
 		stdout-path = "serial2:115200n8";
 		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000 security=apparmor systemd.unified_cgroup_hierarchy=0";
@@ -402,6 +407,7 @@
                gpios = <40 GPIO_ACTIVE_HIGH>;
        };
 };
+
 &main_i2c1 {
 	status = "okay";
 	pinctrl-names = "default";
